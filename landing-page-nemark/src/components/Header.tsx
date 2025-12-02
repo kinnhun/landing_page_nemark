@@ -1,25 +1,44 @@
-import Link from 'next/link';
 import React from 'react';
-import useUserLanguage from '../hooks/useUserLanguage';
 
 const Header: React.FC = () => {
-  const [t, lang, setLang] = useUserLanguage();
-
   return (
-    <header className="site-header" style={{padding: '12px 20px', borderBottom: '1px solid #eaeaea', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-      <div style={{display: 'flex', gap: 12, alignItems: 'center'}}>
-        <Link href="/" style={{fontWeight: 700, textDecoration: 'none'}}>
-          {t('title') || 'Nemark'}
-        </Link>
-        <nav style={{display: 'flex', gap: 8}}>
-          <Link href="/home">{t('home.heading') || 'Home'}</Link>
-        </nav>
-      </div>
+    <header id="header" className="header d-flex align-items-center fixed-top">
+      <div className="container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-      <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-        <span style={{fontSize: 13, color: '#666'}}>{lang}</span>
-        <button onClick={() => setLang('en')} aria-label="switch-to-en">EN</button>
-        <button onClick={() => setLang('vi')} aria-label="switch-to-vi">VI</button>
+        <a href="/" className="logo d-flex align-items-center">
+          {/* <img src="/assets/img/logo.png" alt="" /> */}
+          <h1 className="sitename">Nemark</h1>
+        </a>
+
+        <nav id="navmenu" className="navmenu">
+          <ul>
+            <li><a href="#hero" className="active">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#team">Team</a></li>
+            <li className="dropdown"><a href="#"><span>Dropdown</span> <i className="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>
+                <li><a href="#">Dropdown 1</a></li>
+                <li className="dropdown"><a href="#"><span>Deep Dropdown</span> <i className="bi bi-chevron-down toggle-dropdown"></i></a>
+                  <ul>
+                    <li><a href="#">Deep Dropdown 1</a></li>
+                    <li><a href="#">Deep Dropdown 2</a></li>
+                    <li><a href="#">Deep Dropdown 3</a></li>
+                    <li><a href="#">Deep Dropdown 4</a></li>
+                    <li><a href="#">Deep Dropdown 5</a></li>
+                  </ul>
+                </li>
+                <li><a href="#">Dropdown 2</a></li>
+                <li><a href="#">Dropdown 3</a></li>
+                <li><a href="#">Dropdown 4</a></li>
+              </ul>
+            </li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+          <i className="mobile-nav-toggle d-xl-none bi bi-list"></i>
+        </nav>
+
       </div>
     </header>
   );

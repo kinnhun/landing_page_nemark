@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Primary palette (hồng phấn / powder pink) */
+  --primary: #ffb6c1; /* lightpink */
+  --primary-600: #ff96b0; /* slightly stronger */
+  --primary-800: #ff7b96;
 }
 
 @theme inline {
@@ -10,6 +14,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +28,32 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Global accents using primary color */
+a,
+.text-primary {
+  color: var(--color-primary);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #ffffff;
+  border: none;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Slight hover for primary actions */
+.btn-primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Make sure form controls that use CSS variables are readable */
+input, textarea, select, button {
+  font-family: inherit;
 }

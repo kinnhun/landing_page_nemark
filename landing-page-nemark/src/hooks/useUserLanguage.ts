@@ -23,12 +23,12 @@ function useUserLanguage(ns?: string | string[]): UseUserLanguageReturn {
   );
 
   const lang =
-    i18n.language ||
-    (typeof i18n.options.fallbackLng === "string"
-      ? i18n.options.fallbackLng
-      : Array.isArray(i18n.options.fallbackLng)
-        ? i18n.options.fallbackLng[0]
-        : "en");
+    i18n.language ?? i18n.resolvedLanguage ?? (() => {
+      const fallback = i18n.options?.fallbackLng;
+      if (typeof fallback === 'string') return fallback;
+      if (Array.isArray(fallback) && fallback.length > 0) return fallback[0];
+      return 'en';
+    })();
 
   return [t as TFunction, lang, setLanguage] as const;
 }

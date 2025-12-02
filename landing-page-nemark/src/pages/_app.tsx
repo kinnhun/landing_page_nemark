@@ -1,8 +1,9 @@
 import "@/styles/globals.css";
+import i18n from "../i18n";
 import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextPage } from "next";
-import { ReactElement, ReactNode } from "react";
+import { ReactElement, ReactNode, useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,25 @@ type AppPropsWithLayout = AppProps & {
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
+
+  // Detect browser language after hydration and update i18n.
+  // This prevents hydration mismatch by keeping the initial
+  // server-rendered language consistent (fallback 'en').
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const nav = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+      const short = String(nav).split("-")[0];
+      const target = short === "vi" ? "vi" : "en";
+      if (i18n.language !== target) {
+        i18n.changeLanguage(target).catch(() => {
+          /* ignore */
+        });
+      }
+    } catch {
+      // ignore detection errors
+    }
+  }, []);
 
   return (
     <main className={`${geistSans.variable} ${geistMono.variable} antialiased`}>

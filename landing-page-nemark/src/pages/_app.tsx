@@ -4,7 +4,6 @@ import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextPage } from "next";
 import { ReactElement, ReactNode, useEffect } from "react";
-import useTemplateScripts from "../hooks/useTemplateScripts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,9 +26,6 @@ type AppPropsWithLayout = AppProps & {
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   // Use the layout defined at the page level, if available
   const getLayout = Component.getLayout ?? ((page) => page);
-
-  // Initialize template scripts
-  useTemplateScripts();
 
   // Detect browser language after hydration and update i18n.
   // This prevents hydration mismatch by keeping the initial

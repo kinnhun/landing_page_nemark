@@ -1,13 +1,19 @@
-/* Bootstrap */
-@import 'bootstrap/dist/css/bootstrap.min.css';
-/* Bootstrap Icons */
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-/* AOS */
-@import 'aos/dist/aos.css';
-/* GLightbox */
-@import 'glightbox/dist/css/glightbox.min.css';
-/* Swiper */
-@import 'swiper/css/bundle';
+@import "tailwindcss";
 
-/* Template Main CSS */
-@import './main.css';
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}

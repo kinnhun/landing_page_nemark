@@ -1,0 +1,9 @@
+{
+    "title": "Nemark Landing",
+    "welcome": "Chào mừng đến với Nemark",
+    "changeLanguage": "Thay đổi ngôn ngữ",
+    "home": {
+        "heading": "Trang chủ",
+        "description": "Đây là trang landing."
+    }
+}

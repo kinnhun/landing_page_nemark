@@ -1,0 +1,9 @@
+{
+    "title": "Nemark Landing",
+    "welcome": "Welcome to Nemark",
+    "changeLanguage": "Change language",
+    "home": {
+        "heading": "Home",
+        "description": "This is the landing page."
+    }
+}

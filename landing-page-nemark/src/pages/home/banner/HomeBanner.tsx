@@ -41,9 +41,9 @@ const HomeBanner = () => {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.6 }}
             >
-              <a 
-                href="#about" 
-                className="inline-block px-10 py-3 border-2 border-white text-white text-base font-medium tracking-wider rounded-full hover:bg-white hover:text-blue-600 transition-all duration-300 shadow-lg"
+              <a
+                href="#about"
+                className="glow-outline inline-block px-10 py-3 border-2 border-white text-white text-base font-medium tracking-wider rounded-full hover:bg-white hover:text-blue-600 transition-all duration-300 shadow-lg"
               >
                 Khám Phá Ngay
               </a>

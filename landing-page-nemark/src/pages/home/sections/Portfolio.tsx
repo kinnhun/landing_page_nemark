@@ -49,7 +49,7 @@ const Portfolio = () => {
   return (
     <section id="portfolio" className="py-16 bg-white scroll-mt-20">
 
-      <div className="container mx-auto px-4 text-center mb-12">
+      <div className="container mx-auto px-4 text-center mb-12 flex flex-col items-center">
         <Reveal direction="up">
           <h2 className="text-3xl font-bold mb-4 uppercase text-gray-800">Dự Án Tiêu Biểu</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">

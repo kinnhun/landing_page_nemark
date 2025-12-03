@@ -18,3 +18,33 @@ body {
   background: var(--background);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Glow outline for buttons */
+.glow-outline {
+  position: relative;
+  z-index: 0;
+}
+.glow-outline::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, rgba(37,99,235,0.95), rgba(6,182,212,0.85), rgba(99,102,241,0.9));
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 240ms ease, transform 320ms ease;
+  transform: scale(0.98);
+  z-index: -1;
+  background-size: 200% 200%;
+  animation: glow-move 3s linear infinite;
+}
+.glow-outline:hover::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@keyframes glow-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

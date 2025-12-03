@@ -70,12 +70,12 @@ const Header: React.FC = () => {
 
         {/* Desktop Nav */}
         <nav className="hidden xl:flex items-center gap-8">
-          <ul className="flex m-0 p-0 list-none gap-6 items-center">
+          <ul className="flex m-0 p-0 list-none gap-6 items-center text-white">
             {navLinks.map(link => (
               <li key={link.id}>
                 <a 
                   href={link.href} 
-                  className={`text-sm font-medium uppercase no-underline transition-colors duration-300 ${
+                  className={`text-sm font-medium uppercase no-underline transition-colors duration-300 text-white ${
                     activeSection === link.id ? 'text-blue-500' : 'text-white hover:text-blue-500'
                   }`}
                 >

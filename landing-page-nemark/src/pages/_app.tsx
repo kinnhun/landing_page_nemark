@@ -4,6 +4,8 @@ import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NextPage } from "next";
 import { ReactElement, ReactNode, useEffect } from "react";
+// Client-only site behavior migrated from legacy `public/assets/js/main.js`
+// Imported dynamically inside useEffect to avoid SSR imports.
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,6 +46,15 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     } catch {
       // ignore detection errors
     }
+    // Initialize migrated site scripts (runs only on client)
+    (async () => {
+      try {
+        const mod = await import("../utils/site");
+        mod?.initSite?.();
+      } catch (e) {
+        // ignore if module can't be loaded
+      }
+    })();
   }, []);
 
   return (

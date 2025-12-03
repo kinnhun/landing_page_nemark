@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Image from 'next/image';
 import { EyeOutlined, LinkOutlined } from '@ant-design/icons';
 import { Image as AntImage } from 'antd';
+import { Reveal, StaggerContainer, StaggerItem } from '@/components/Reveal';
 
 import app1 from '../../../../public/assets/img/portfolio/app-1.jpg';
 import app2 from '../../../../public/assets/img/portfolio/app-2.jpg';
@@ -49,11 +50,13 @@ const Portfolio = () => {
     <section id="portfolio" className="py-16 bg-white scroll-mt-20">
 
       <div className="container mx-auto px-4 text-center mb-12">
-        <h2 className="text-3xl font-bold mb-4 uppercase text-gray-800">Dự Án Tiêu Biểu</h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Các dự án Nemark đã triển khai, bao gồm website doanh nghiệp, ứng dụng, phần mềm
-          quản lý, hệ thống thương mại điện tử và các giải pháp thương hiệu số.
-        </p>
+        <Reveal direction="up">
+          <h2 className="text-3xl font-bold mb-4 uppercase text-gray-800">Dự Án Tiêu Biểu</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Các dự án Nemark đã triển khai, bao gồm website doanh nghiệp, ứng dụng, phần mềm
+            quản lý, hệ thống thương mại điện tử và các giải pháp thương hiệu số.
+          </p>
+        </Reveal>
       </div>
 
       <div className="container mx-auto px-4">
@@ -67,8 +70,8 @@ const Portfolio = () => {
                 onClick={() => setFilter(cat.key)}
                 className={`cursor-pointer px-4 py-2 text-sm font-medium uppercase transition-all duration-300 rounded-full ${
                   filter === cat.key 
-                    ? 'bg-blue-500 text-white shadow-md' 
-                    : 'text-gray-600 hover:text-blue-500 hover:bg-gray-50'
+                    ? 'bg-linear-to-r from-blue-600 to-teal-500 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50'
                 }`}
               >
                 {cat.label}
@@ -78,9 +81,9 @@ const Portfolio = () => {
         </div>
 
         {/* DANH SÁCH DỰ ÁN */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <StaggerContainer key={filter} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredItems.map(item => (
-            <div key={item.id} className="group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 bg-white border border-gray-100">
+            <StaggerItem key={item.id} className="group relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 bg-white border border-gray-100">
               <div className="relative overflow-hidden aspect-4/3">
                 <Image 
                   src={item.img} 
@@ -88,25 +91,25 @@ const Portfolio = () => {
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110" 
                 />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
                   <button 
                     onClick={() => setPreviewImage(item.img.src)}
-                    className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-blue-500 transition-colors duration-300 border-none cursor-pointer"
+                    className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-linear-to-r hover:from-blue-600 hover:to-teal-500 transition-all duration-300 border-none cursor-pointer"
                   >
                     <EyeOutlined className="text-lg" />
                   </button>
-                  <a href={item.img.src} className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-blue-500 transition-colors duration-300">
+                  <a href={item.img.src} className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-linear-to-r hover:from-blue-600 hover:to-teal-500 transition-all duration-300">
                     <LinkOutlined className="text-lg" />
                   </a>
                 </div>
               </div>
               <div className="p-6 text-center">
-                <h4 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-blue-500 transition-colors duration-300">{item.title}</h4>
+                <h4 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">{item.title}</h4>
                 <p className="text-sm text-gray-600">{item.desc}</p>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
       </div>
 

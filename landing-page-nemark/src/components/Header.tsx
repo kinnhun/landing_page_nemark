@@ -56,27 +56,33 @@ const Header: React.FC = () => {
     { href: '#team', label: 'Đội Ngũ', id: 'team' },
   ];
 
+  const textColorClass = scrolled ? 'text-gray-800' : 'text-white';
+  const hoverColorClass = scrolled ? 'hover:text-blue-600' : 'hover:text-blue-300';
+  const activeColorClass = scrolled ? 'text-blue-600' : 'text-blue-300';
+
   return (
     <header 
       id="header" 
       className={`fixed w-full z-50 transition-all duration-500 py-4 ${
-        scrolled ? 'bg-[#474d52] shadow-lg' : 'bg-transparent'
+        scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center text-white no-underline">
-          <h1 className="text-3xl font-normal uppercase m-0 text-white">Nemark</h1>
+        <Link href="/" className="flex items-center no-underline group">
+          <h1 className={`text-3xl font-bold uppercase m-0 transition-colors duration-300 ${
+            scrolled ? 'text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500' : 'text-white'
+          }`}>Nemark</h1>
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden xl:flex items-center gap-8">
-          <ul className="flex m-0 p-0 list-none gap-6 items-center text-white">
+          <ul className={`flex m-0 p-0 list-none gap-6 items-center ${textColorClass}`}>
             {navLinks.map(link => (
               <li key={link.id}>
                 <a 
                   href={link.href} 
-                  className={`text-sm font-medium uppercase no-underline transition-colors duration-300 text-white ${
-                    activeSection === link.id ? 'text-blue-500' : 'text-white hover:text-blue-500'
+                  className={`text-sm font-medium uppercase no-underline transition-colors duration-300 ${
+                    activeSection === link.id ? activeColorClass : `${textColorClass} ${hoverColorClass}`
                   }`}
                 >
                   {link.label}
@@ -86,7 +92,7 @@ const Header: React.FC = () => {
             
             <li>
               <Dropdown menu={{ items }} trigger={['hover']}>
-                <a onClick={(e) => e.preventDefault()} className="text-white hover:text-blue-500 cursor-pointer flex items-center gap-1 text-sm font-medium uppercase transition-colors duration-300">
+                <a onClick={(e) => e.preventDefault()} className={`${textColorClass} ${hoverColorClass} cursor-pointer flex items-center gap-1 text-sm font-medium uppercase transition-colors duration-300`}>
                   <Space>
                     Thêm
                     <DownOutlined className="text-xs" />
@@ -99,7 +105,7 @@ const Header: React.FC = () => {
               <a 
                 href="#contact" 
                 className={`text-sm font-medium uppercase no-underline transition-colors duration-300 ${
-                  activeSection === 'contact' ? 'text-blue-500' : 'text-white hover:text-blue-500'
+                  activeSection === 'contact' ? activeColorClass : `${textColorClass} ${hoverColorClass}`
                 }`}
               >
                 Liên Hệ
@@ -111,13 +117,13 @@ const Header: React.FC = () => {
         {/* Mobile Nav Toggle */}
         <div className="xl:hidden">
             <MenuOutlined 
-                className="text-white text-2xl cursor-pointer" 
+                className={`${textColorClass} text-2xl cursor-pointer transition-colors duration-300`} 
                 onClick={() => setMobileMenuOpen(true)}
             />
         </div>
 
         <Drawer
-            title="Menu"
+            title={<span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-bold text-xl">NEMARK</span>}
             placement="right"
             onClose={() => setMobileMenuOpen(false)}
             open={mobileMenuOpen}
@@ -127,7 +133,9 @@ const Header: React.FC = () => {
                     <li key={link.id}>
                         <a 
                             href={link.href} 
-                            className="text-gray-800 hover:text-blue-500 text-lg font-medium block"
+                            className={`text-lg font-medium block transition-colors duration-300 ${
+                              activeSection === link.id ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+                            }`}
                             onClick={() => setMobileMenuOpen(false)}
                         >
                             {link.label}
@@ -135,7 +143,13 @@ const Header: React.FC = () => {
                     </li>
                 ))}
                  <li>
-                    <a href="#contact" className="text-gray-800 hover:text-blue-500 text-lg font-medium block" onClick={() => setMobileMenuOpen(false)}>
+                    <a 
+                      href="#contact" 
+                      className={`text-lg font-medium block transition-colors duration-300 ${
+                        activeSection === 'contact' ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
                         Liên Hệ
                     </a>
                 </li>

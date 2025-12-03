@@ -26,12 +26,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          # cache removed because no package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install  # không yêu cầu lockfile
 
-      - name: Build Next.js
+      - name: Build Next.js (export static)
         run: npm run build
 
       - name: Upload artifact

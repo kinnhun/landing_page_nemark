@@ -1,5 +1,9 @@
 import React from 'react'
 import Image from 'next/image';
+import team1 from '../../../../public/assets/img/team/team-1.jpg';
+import team2 from '../../../../public/assets/img/team/team-2.jpg';
+import team3 from '../../../../public/assets/img/team/team-3.jpg';
+import team4 from '../../../../public/assets/img/team/team-4.jpg';
 import { TwitterOutlined, FacebookOutlined, InstagramOutlined, LinkedinOutlined } from '@ant-design/icons';
 
 const Team = () => {
@@ -20,7 +24,7 @@ const Team = () => {
           {/* CEO */}
           <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="100">
             <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-              <Image src="/assets/img/team/team-1.jpg" alt="" fill className="object-cover" />
+              <Image src={team1} alt="" fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="text-xl font-bold text-gray-800 mb-1">Nguyễn Minh Khôi</h4>
@@ -41,7 +45,7 @@ const Team = () => {
           {/* Product Manager */}
           <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="200">
             <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-              <Image src="/assets/img/team/team-2.jpg" alt="" fill className="object-cover" />
+              <Image src={team2} alt="" fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="text-xl font-bold text-gray-800 mb-1">Trần Thu Hà</h4>
@@ -62,7 +66,7 @@ const Team = () => {
           {/* CTO */}
           <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="300">
             <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-              <Image src="/assets/img/team/team-3.jpg" alt="" fill className="object-cover" />
+              <Image src={team3} alt="" fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="text-xl font-bold text-gray-800 mb-1">Phạm Hoàng Long</h4>
@@ -83,7 +87,7 @@ const Team = () => {
           {/* Kế toán / Vận hành */}
           <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300" data-aos="fade-up" data-aos-delay="400">
             <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-              <Image src="/assets/img/team/team-4.jpg" alt="" fill className="object-cover" />
+              <Image src={team4} alt="" fill className="object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="text-xl font-bold text-gray-800 mb-1">Lê Mai Anh</h4>

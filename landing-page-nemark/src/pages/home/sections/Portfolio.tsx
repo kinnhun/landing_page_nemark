@@ -3,6 +3,19 @@ import Image from 'next/image';
 import { EyeOutlined, LinkOutlined } from '@ant-design/icons';
 import { Image as AntImage } from 'antd';
 
+import app1 from '../../../../public/assets/img/portfolio/app-1.jpg';
+import app2 from '../../../../public/assets/img/portfolio/app-2.jpg';
+import app3 from '../../../../public/assets/img/portfolio/app-3.jpg';
+import product1 from '../../../../public/assets/img/portfolio/product-1.jpg';
+import product2 from '../../../../public/assets/img/portfolio/product-2.jpg';
+import product3 from '../../../../public/assets/img/portfolio/product-3.jpg';
+import branding1 from '../../../../public/assets/img/portfolio/branding-1.jpg';
+import branding2 from '../../../../public/assets/img/portfolio/branding-2.jpg';
+import branding3 from '../../../../public/assets/img/portfolio/branding-3.jpg';
+import books1 from '../../../../public/assets/img/portfolio/books-1.jpg';
+import books2 from '../../../../public/assets/img/portfolio/books-2.jpg';
+import books3 from '../../../../public/assets/img/portfolio/books-3.jpg';
+
 const Portfolio = () => {
   const [filter, setFilter] = useState('*');
   const [previewImage, setPreviewImage] = useState('');
@@ -16,18 +29,18 @@ const Portfolio = () => {
   ];
 
   const items = [
-    { id: 1, category: 'app', title: 'Ứng Dụng Quản Lý', desc: 'Giải pháp quản lý bán hàng & vận hành dành cho doanh nghiệp SMEs.', img: '/assets/img/portfolio/app-1.jpg' },
-    { id: 2, category: 'product', title: 'Website Thương Mại', desc: 'Hệ thống website bán hàng tối ưu SEO & trải nghiệm người dùng.', img: '/assets/img/portfolio/product-1.jpg' },
-    { id: 3, category: 'branding', title: 'Thiết Kế Thương Hiệu', desc: 'Bộ nhận diện doanh nghiệp đồng bộ và hiện đại.', img: '/assets/img/portfolio/branding-1.jpg' },
-    { id: 4, category: 'books', title: 'Tài Liệu Sản Phẩm', desc: 'Tài liệu hướng dẫn & ấn phẩm giới thiệu giải pháp công nghệ.', img: '/assets/img/portfolio/books-1.jpg' },
-    { id: 5, category: 'app', title: 'Ứng Dụng Mobile', desc: 'Ứng dụng chăm sóc khách hàng & đặt lịch dịch vụ cho doanh nghiệp.', img: '/assets/img/portfolio/app-2.jpg' },
-    { id: 6, category: 'product', title: 'Website Dịch Vụ', desc: 'Giải pháp website đặt lịch và bán dịch vụ chuyên nghiệp.', img: '/assets/img/portfolio/product-2.jpg' },
-    { id: 7, category: 'branding', title: 'Logo & Bộ Nhận Diện', desc: 'Xây dựng hình ảnh thương hiệu theo phong cách hiện đại.', img: '/assets/img/portfolio/branding-2.jpg' },
-    { id: 8, category: 'books', title: 'Ấn Phẩm Số', desc: 'Thiết kế tài liệu digital phục vụ quảng cáo & truyền thông.', img: '/assets/img/portfolio/books-2.jpg' },
-    { id: 9, category: 'app', title: 'Ứng Dụng Doanh Nghiệp', desc: 'Giải pháp tối ưu vận hành & quản lý nội bộ cho doanh nghiệp.', img: '/assets/img/portfolio/app-3.jpg' },
-    { id: 10, category: 'product', title: 'Website Doanh Nghiệp', desc: 'Website giới thiệu công ty chuẩn SEO, giao diện chuyên nghiệp.', img: '/assets/img/portfolio/product-3.jpg' },
-    { id: 11, category: 'branding', title: 'Thiết Kế Bộ Nhận Diện', desc: 'Thiết kế đồng bộ hình ảnh, nâng tầm thương hiệu doanh nghiệp.', img: '/assets/img/portfolio/branding-3.jpg' },
-    { id: 12, category: 'books', title: 'Tài Liệu Doanh Nghiệp', desc: 'Tài liệu, infographic và báo cáo trình bày hiện đại.', img: '/assets/img/portfolio/books-3.jpg' },
+    { id: 1, category: 'app', title: 'Ứng Dụng Quản Lý', desc: 'Giải pháp quản lý bán hàng & vận hành dành cho doanh nghiệp SMEs.', img: app1 },
+    { id: 2, category: 'product', title: 'Website Thương Mại', desc: 'Hệ thống website bán hàng tối ưu SEO & trải nghiệm người dùng.', img: product1 },
+    { id: 3, category: 'branding', title: 'Thiết Kế Thương Hiệu', desc: 'Bộ nhận diện doanh nghiệp đồng bộ và hiện đại.', img: branding1 },
+    { id: 4, category: 'books', title: 'Tài Liệu Sản Phẩm', desc: 'Tài liệu hướng dẫn & ấn phẩm giới thiệu giải pháp công nghệ.', img: books1 },
+    { id: 5, category: 'app', title: 'Ứng Dụng Mobile', desc: 'Ứng dụng chăm sóc khách hàng & đặt lịch dịch vụ cho doanh nghiệp.', img: app2 },
+    { id: 6, category: 'product', title: 'Website Dịch Vụ', desc: 'Giải pháp website đặt lịch và bán dịch vụ chuyên nghiệp.', img: product2 },
+    { id: 7, category: 'branding', title: 'Logo & Bộ Nhận Diện', desc: 'Xây dựng hình ảnh thương hiệu theo phong cách hiện đại.', img: branding2 },
+    { id: 8, category: 'books', title: 'Ấn Phẩm Số', desc: 'Thiết kế tài liệu digital phục vụ quảng cáo & truyền thông.', img: books2 },
+    { id: 9, category: 'app', title: 'Ứng Dụng Doanh Nghiệp', desc: 'Giải pháp tối ưu vận hành & quản lý nội bộ cho doanh nghiệp.', img: app3 },
+    { id: 10, category: 'product', title: 'Website Doanh Nghiệp', desc: 'Website giới thiệu công ty chuẩn SEO, giao diện chuyên nghiệp.', img: product3 },
+    { id: 11, category: 'branding', title: 'Thiết Kế Bộ Nhận Diện', desc: 'Thiết kế đồng bộ hình ảnh, nâng tầm thương hiệu doanh nghiệp.', img: branding3 },
+    { id: 12, category: 'books', title: 'Tài Liệu Doanh Nghiệp', desc: 'Tài liệu, infographic và báo cáo trình bày hiện đại.', img: books3 },
   ];
 
   const filteredItems = filter === '*' ? items : items.filter(item => item.category === filter);
@@ -77,12 +90,12 @@ const Portfolio = () => {
                 />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
                   <button 
-                    onClick={() => setPreviewImage(item.img)}
+                    onClick={() => setPreviewImage(item.img.src)}
                     className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-blue-500 transition-colors duration-300 border-none cursor-pointer"
                   >
                     <EyeOutlined className="text-lg" />
                   </button>
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-blue-500 transition-colors duration-300">
+                  <a href={item.img.src} className="w-10 h-10 rounded-full bg-white/20 text-white flex items-center justify-center hover:bg-blue-500 transition-colors duration-300">
                     <LinkOutlined className="text-lg" />
                   </a>
                 </div>

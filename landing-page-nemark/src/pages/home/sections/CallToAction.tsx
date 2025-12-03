@@ -1,10 +1,12 @@
 import React from 'react'
+import Image from 'next/image';
+import ctaBg from '../../../../public/assets/img/cta-bg.jpg';
 
 const CallToAction = () => {
   return (
     <section id="call-to-action" className="relative py-20 bg-[#2f3942] text-white overflow-hidden scroll-mt-20">
-      <img 
-        src="/assets/img/cta-bg.jpg" 
+      <Image 
+        src={ctaBg} 
         alt="Call To Action" 
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-50"
       />

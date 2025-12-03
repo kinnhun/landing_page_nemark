@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Image from 'next/image';
+import aboutImg from '../../../../public/assets/img/about.jpg';
 import { DeploymentUnitOutlined, CodeOutlined, CloudServerOutlined } from '@ant-design/icons';
 import { Modal } from 'antd';
 
@@ -14,7 +16,7 @@ const About = () => {
           <div 
             className="lg:w-1/2 relative flex items-center lg:order-last" 
           >
-            <img src="/assets/img/about.jpg" className="w-full h-auto block" alt="Nemark About" />
+            <Image src={aboutImg} className="w-full h-auto block" alt="Nemark About" />
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <a 

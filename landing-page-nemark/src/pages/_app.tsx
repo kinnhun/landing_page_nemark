@@ -1,65 +1,101 @@
 import "@/styles/globals.css";
-import i18n from "../i18n";
+import { StyleProvider, createCache } from '@ant-design/cssinjs';
 import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NextPage } from "next";
-import { ReactElement, ReactNode, useEffect } from "react";
-// Client-only site behavior migrated from legacy `public/assets/js/main.js`
-// Imported dynamically inside useEffect to avoid SSR imports.
+import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/router";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+import AdminLayout from "@/layouts/AdminLayout";
+import UserLayout from "@/layouts/UserLayout";
+
+const geistSans = Geist({ 
+  variable: "--font-geist-sans", 
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const geistMono = Geist_Mono({ 
+  variable: "--font-geist-mono", 
   subsets: ["latin"],
+  display: 'swap',
+  preload: true,
 });
 
-export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
-};
+// Create cache once for client-side
+const clientCache = createCache();
 
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
+export default function App({ Component, pageProps }: AppProps) {
+  const router = useRouter();
+  const [isRouteChanging, setIsRouteChanging] = useState(false);
 
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout ?? ((page) => page);
+  // Determine layout based on route
+  const path = router.pathname;
+  const isAdmin = path.startsWith("/admin");
 
-  // Detect browser language after hydration and update i18n.
-  // This prevents hydration mismatch by keeping the initial
-  // server-rendered language consistent (fallback 'en').
+  // Memoize layout to prevent re-render on route change
+  const Layout = useMemo(() => {
+    return isAdmin ? AdminLayout : UserLayout;
+  }, [isAdmin]);
+
+  // Handle route change loading states
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const nav = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
-      const short = String(nav).split("-")[0];
-      const target = short === "vi" ? "vi" : "en";
-      if (i18n.language !== target) {
-        i18n.changeLanguage(target).catch(() => {
-          /* ignore */
-        });
+    const handleStart = (url: string) => {
+      if (url !== router.asPath) {
+        setIsRouteChanging(true);
       }
-    } catch {
-      // ignore detection errors
-    }
-    // Initialize migrated site scripts (runs only on client)
-    (async () => {
-      try {
-        const mod = await import("../utils/site");
-        mod?.initSite?.();
-      } catch (e) {
-        // ignore if module can't be loaded
-      }
-    })();
-  }, []);
+    };
+    
+    const handleComplete = () => {
+      setIsRouteChanging(false);
+    };
+
+    router.events.on('routeChangeStart', handleStart);
+    router.events.on('routeChangeComplete', handleComplete);
+    router.events.on('routeChangeError', handleComplete);
+
+    return () => {
+      router.events.off('routeChangeStart', handleStart);
+      router.events.off('routeChangeComplete', handleComplete);
+      router.events.off('routeChangeError', handleComplete);
+    };
+  }, [router]);
 
   return (
-    <main className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      {getLayout(<Component {...pageProps} />)}
-    </main>
+    <StyleProvider cache={clientCache} hashPriority="high">
+      <ThemeProvider locale="vi">
+        <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          {/* Loading overlay during route transitions */}
+          {isRouteChanging && (
+            <div 
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #2563eb 100%)',
+                backgroundSize: '200% 100%',
+                animation: 'loading 1.5s ease-in-out infinite',
+                zIndex: 9999,
+              }}
+            />
+          )}
+          
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+          
+          {/* Loading animation keyframes */}
+          <style jsx global>{`
+            @keyframes loading {
+              0% { background-position: 200% 0; }
+              100% { background-position: -200% 0; }
+            }
+          `}</style>
+        </div>
+      </ThemeProvider>
+    </StyleProvider>
   );
 }

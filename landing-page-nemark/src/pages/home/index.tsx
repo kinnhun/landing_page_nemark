@@ -1,7 +1,4 @@
 import React from 'react'
-import UserLayout from '../../layouts/UserLayout'
-import type { ReactElement } from 'react'
-import type { NextPageWithLayout } from '../_app'
 import HomeBanner from './banner/HomeBanner'
 import About from './sections/About'
 import Stats from './sections/Stats'
@@ -12,7 +9,7 @@ import Pricing from './sections/Pricing'
 import Team from './sections/Team'
 import Contact from './sections/Contact'
 
-const HomePage: NextPageWithLayout = () => {
+const HomePage = () => {
   return (
     <>
       <HomeBanner />
@@ -26,10 +23,6 @@ const HomePage: NextPageWithLayout = () => {
       <Contact />
     </>
   )
-}
-
-HomePage.getLayout = function getLayout(page: ReactElement) {
-  return <UserLayout>{page}</UserLayout>
 }
 
 export default HomePage

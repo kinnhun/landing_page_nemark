@@ -1,24 +1,40 @@
-import React from 'react';
 import { createCache, extractStyle, StyleProvider } from '@ant-design/cssinjs';
-import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
+import Document, { Html, Head, Main, NextScript, DocumentContext, DocumentInitialProps } from "next/document";
+import React from 'react';
 
-const MyDocument = () => {
+export default function MyDocument() {
   return (
-    <Html lang="en">
+    <Html lang="vi">
       <Head>
         <meta charSet="utf-8" />
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-        <meta name="description" content="" />
-        <meta name="keywords" content="" />
+        <meta name="description" content="Nemark - Enterprise Landing Page" />
+        <meta name="keywords" content="nemark, landing page, enterprise" />
 
         {/* Favicons */}
         <link href="/assets/img/favicon.png" rel="icon" />
         <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
 
-        {/* Fonts */}
+        {/* Preconnect to improve font loading */}
         <link href="https://fonts.googleapis.com" rel="preconnect" />
-        <link href="https://fonts.gstatic.com" rel="preconnect" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossOrigin="" />
+        
+        {/* Optimized font loading - only load needed weights */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+        
+        {/* Prevent FOUC with critical CSS */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          body { 
+            margin: 0; 
+            opacity: 1; 
+            transition: opacity 0.3s ease-in-out;
+          }
+          #__next { 
+            min-height: 100vh; 
+          }
+        `}} />
       </Head>
       <body className="index-page">
         <Main />
@@ -26,12 +42,17 @@ const MyDocument = () => {
       </body>
     </Html>
   );
-};
+}
 
-MyDocument.getInitialProps = async (ctx: DocumentContext) => {
+// Critical SSR setup for Ant Design to prevent FOUC
+MyDocument.getInitialProps = async (ctx: DocumentContext): Promise<DocumentInitialProps & { styles: React.ReactElement }> => {
+  // Create cache for Ant Design styles
   const cache = createCache();
+  
+  // Store original renderPage
   const originalRenderPage = ctx.renderPage;
 
+  // Wrap app with StyleProvider to extract styles
   ctx.renderPage = () =>
     originalRenderPage({
       enhanceApp: (App) => (props) => (
@@ -41,17 +62,25 @@ MyDocument.getInitialProps = async (ctx: DocumentContext) => {
       ),
     });
 
+  // Get initial props from Document
   const initialProps = await Document.getInitialProps(ctx);
+  
+  // Extract styles from cache
   const style = extractStyle(cache, true);
+
   return {
     ...initialProps,
     styles: (
       <>
         {initialProps.styles}
-        <style dangerouslySetInnerHTML={{ __html: style }} />
+        {/* Inject Ant Design styles inline to prevent FOUC */}
+        {style && (
+          <style 
+            dangerouslySetInnerHTML={{ __html: style }} 
+            data-ant-cssinjs-cache-key="ant-design-ssr"
+          />
+        )}
       </>
     ),
   };
 };
-
-export default MyDocument;

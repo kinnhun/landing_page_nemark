@@ -1,6 +1,5 @@
 import React from 'react';
 import { ReactElement } from 'react';
-import AdminLayout from '../../../layouts/AdminLayout';
 import { Form, Input, Button, Switch, Divider, Select } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 
@@ -85,10 +84,6 @@ const SettingsPage = () => {
       </div>
     </div>
   );
-};
-
-SettingsPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default SettingsPage;

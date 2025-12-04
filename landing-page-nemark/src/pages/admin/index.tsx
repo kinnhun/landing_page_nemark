@@ -1,6 +1,5 @@
 import React from 'react';
 import { ReactElement } from 'react';
-import AdminLayout from '../../layouts/AdminLayout';
 import { Card, Row, Col, Statistic, Table, Tag } from 'antd';
 import { ArrowUpOutlined, ArrowDownOutlined, UserOutlined, ShoppingCartOutlined, DollarOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -149,10 +148,6 @@ const AdminDashboard = () => {
       </div>
     </div>
   );
-};
-
-AdminDashboard.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default AdminDashboard;

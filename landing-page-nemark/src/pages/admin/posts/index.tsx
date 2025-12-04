@@ -1,6 +1,5 @@
 import React from 'react';
 import { ReactElement } from 'react';
-import AdminLayout from '../../../layouts/AdminLayout';
 import { Table, Tag, Space, Button, Input } from 'antd';
 import { PlusOutlined, SearchOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -98,10 +97,6 @@ const PostsPage = () => {
       </div>
     </div>
   );
-};
-
-PostsPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default PostsPage;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { ReactElement } from 'react';
-import AdminLayout from '../../../layouts/AdminLayout';
 import { Table, Tag, Space, Button, Input, Tooltip } from 'antd';
 import { SearchOutlined, EditOutlined, DeleteOutlined, UserAddOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
@@ -132,10 +131,6 @@ const UsersPage = () => {
       </div>
     </div>
   );
-};
-
-UsersPage.getLayout = function getLayout(page: ReactElement) {
-  return <AdminLayout>{page}</AdminLayout>;
 };
 
 export default UsersPage;

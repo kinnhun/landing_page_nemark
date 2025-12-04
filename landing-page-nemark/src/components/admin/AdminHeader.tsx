@@ -1,6 +1,7 @@
 import React from 'react';
-import { Layout, Button, Avatar, Dropdown, Badge, Breadcrumb } from 'antd';
+import { Layout, Button, Dropdown, Badge, Breadcrumb } from 'antd';
 import type { BreadcrumbProps } from 'antd';
+import Avatar from 'antd/lib/avatar';
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,

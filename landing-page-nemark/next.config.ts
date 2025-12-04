@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig = {
+  // Set static export output for `next export` replacement
+  // (required for GitHub Pages artifact that expects `out/`)
+  output: 'export',
+  // Note: if your app requires SSR, remove this and use a server deployment.
   // SSR enabled - removed 'output: export' for full SSR support
   reactStrictMode: true,
   images: {

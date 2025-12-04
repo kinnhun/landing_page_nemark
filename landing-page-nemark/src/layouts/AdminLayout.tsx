@@ -28,15 +28,16 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   }
 
   return (
-    <Layout className="min-h-screen bg-slate-50">
+    <Layout className="min-h-screen" style={{ background: 'var(--brand-background)' }}>
       <AdminSidebar collapsed={collapsed} />
       <Layout
-        className="transition-all duration-300 ease-in-out bg-slate-50"
+        className="transition-all duration-300 ease-in-out"
         style={{
           display: "flex",
           flexDirection: "column",
           minHeight: "100vh",
-          // marginLeft: collapsed ? 80 : 200,
+          background: 'var(--brand-background)',
+          color: 'var(--brand-text)'
         }}
       >
         <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed} />

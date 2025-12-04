@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { Toaster } from 'sonner';
 
 import AdminLayout from "@/layouts/AdminLayout";
 import UserLayout from "@/layouts/UserLayout";
@@ -86,6 +87,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Layout>
             <Component {...pageProps} />
           </Layout>
+          <Toaster position="top-right" />
           
           {/* Loading animation keyframes */}
           <style jsx global>{`

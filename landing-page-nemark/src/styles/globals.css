@@ -1,8 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #1f2937; /* gray-800 */
+  /* theme managed variables (overridden by ThemeContext) */
+  --brand-primary: #2563eb;
+  --brand-secondary: #10b981;
+  --brand-accent: #f59e0b;
+  --brand-background: #ffffff;
+  --brand-text: #1f2937;
+
+  --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: var(--font-primary);
+  --base-font-size: 16px;
+  --heading-weight: 700;
+  --body-weight: 400;
+  --line-height: 1.6;
 }
 
 /* Force light mode appearance */
@@ -14,9 +25,11 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  color: var(--brand-text);
+  background: var(--brand-background);
+  font-family: var(--font-primary), var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: var(--base-font-size);
+  line-height: var(--line-height);
 }
 
 /* Glow outline for buttons */
@@ -24,6 +37,19 @@ body {
   position: relative;
   z-index: 0;
 }
+
+/* Heading styles that follow theme */
+h1,h2,h3,h4,h5,h6 {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+}
+
+/* Utility classes referencing brand vars */
+.bg-brand { background-color: var(--brand-primary); }
+.text-brand { color: var(--brand-primary); }
+.bg-brand-secondary { background-color: var(--brand-secondary); }
+.text-brand-secondary { color: var(--brand-secondary); }
+.btn-brand { background-color: var(--brand-primary); border-color: var(--brand-primary); color: #fff; }
 .glow-outline::before {
   content: "";
   position: absolute;

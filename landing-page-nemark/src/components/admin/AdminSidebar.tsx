@@ -27,19 +27,46 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
       label: 'Dashboard',
     },
     {
-      key: '/admin/users',
-      icon: <UserOutlined />,
-      label: 'Quản Lý Người Dùng',
-    },
-    {
-      key: '/admin/products',
-      icon: <AppstoreOutlined />,
-      label: 'Sản Phẩm / Dịch Vụ',
-    },
-    {
-      key: '/admin/posts',
-      icon: <FileTextOutlined />,
-      label: 'Bài Viết',
+      key: '/admin/settings-landing-page',
+      icon: <SettingOutlined />,
+      label: 'Cài Đặt Trang Home',
+      children: [
+        {
+          key: '/admin/settings-landing-page/general',
+          icon: <AppstoreOutlined />,
+          label: 'Tổng Quan',
+        },
+        {
+          key: '/admin/settings-landing-page/banner',
+          icon: <FileTextOutlined />, 
+          label: 'Cài Đặt Banner',
+        },
+        {
+          key: '/admin/settings-landing-page/about',
+          icon: <AppstoreOutlined />,
+          label: 'Cài Đặt About',
+        },
+        {
+          key: '/admin/settings-landing-page/services',
+          icon: <AppstoreOutlined />,
+          label: 'Cài Đặt Dịch Vụ',
+        },
+        {
+          key: '/admin/settings-landing-page/portfolio',
+          icon: <FileTextOutlined />,
+          label: 'Cài Đặt Portfolio',
+        },
+        {
+          key: '/admin/settings-landing-page/team',
+          icon: <UserOutlined />,
+          label: 'Cài Đặt Team',
+        },
+        {
+          key: '/admin/settings-landing-page/contact',
+          icon: <FileTextOutlined />,
+          label: 'Cài Đặt Liên Hệ',
+        },
+      ],
     },
     {
       key: '/admin/settings',
@@ -95,6 +122,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
               theme="light"
               mode="inline"
               selectedKeys={[router.pathname]}
+              defaultOpenKeys={router.pathname.startsWith('/admin/settings-landing-page') ? ['/admin/settings-landing-page'] : []}
               onClick={({ key }) => router.push(key)}
               items={menuItems}
               className="border-r-0 font-medium text-gray-600"

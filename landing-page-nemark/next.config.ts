@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
 
 const nextConfig = {
-  // SSR enabled - removed 'output: export' for full SSR support
+  // Static export for GitHub Pages
+  output: 'export',
   reactStrictMode: true,
   images: {
     unoptimized: true, // Keep if deploying to static hosting

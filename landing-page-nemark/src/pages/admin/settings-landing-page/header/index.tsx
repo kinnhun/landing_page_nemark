@@ -244,17 +244,20 @@ const HeaderSettingPage: React.FC = () => {
       return;
     }
 
-    let found: MenuItem | null = null;
-    const find = (items: MenuItem[]) => {
+    const findMenuItem = (items: MenuItem[], id: string): MenuItem | null => {
       for (const item of items) {
-        if (item.id === selectedKey) {
-          found = item;
-          return;
+        if (item.id === id) {
+          return item;
         }
-        if (item.children) find(item.children);
+        if (item.children) {
+          const found = findMenuItem(item.children, id);
+          if (found) return found;
+        }
       }
+      return null;
     };
-    find(settings.menu?.items || []);
+
+    const found = findMenuItem(settings.menu?.items || [], selectedKey);
 
     if (!found) {
       message.error('Không tìm thấy mục cần chỉnh sửa.');
@@ -313,7 +316,7 @@ const HeaderSettingPage: React.FC = () => {
       };
 
       const saved = await saveHeaderSettings(out);
-      if (saved) {
+        if (saved) {
         setSettings(saved);
         try {
           localStorage.setItem(
@@ -325,20 +328,17 @@ const HeaderSettingPage: React.FC = () => {
           // ignore
         }
 
-        message.success('Đã lưu cài đặt header.');
         notifyCustom('success', {
           title: 'Lưu thành công',
           description: 'Cài đặt header đã được cập nhật.',
         });
       } else {
-        message.error('Không thể lưu cài đặt header.');
         notifyCustom('error', {
           title: 'Lưu thất bại',
           description: 'Không thể lưu cài đặt header.',
         });
       }
     } catch (err) {
-      message.error('Có lỗi xảy ra khi lưu.');
       notifyCustom('error', {
         title: 'Lỗi lưu dữ liệu',
         description: String(err),
@@ -404,7 +404,7 @@ const HeaderSettingPage: React.FC = () => {
       </div>
       {settings.cta?.visible !== false && (
         <a
-          href={settings.cta.link || '#contact'}
+          href={settings.cta?.link || '#contact'}
           style={{
             background: '#1677ff',
             color: '#ffffff',
@@ -412,7 +412,7 @@ const HeaderSettingPage: React.FC = () => {
             borderRadius: 6,
           }}
         >
-          {settings.cta.label || 'Liên Hệ'}
+          {settings.cta?.label || 'Liên Hệ'}
         </a>
       )}
     </div>
@@ -553,14 +553,14 @@ const HeaderSettingPage: React.FC = () => {
                   <Text>Loại</Text>
                   <Select
                     value={settings.background?.initial?.type || 'solid'}
-                    onChange={(v) =>
+                    onChange={(v: 'solid' | 'gradient' | 'transparent') =>
                       setSettings({
                         ...settings,
                         background: {
                           ...settings.background,
                           initial: {
                             ...(settings.background?.initial || {}),
-                            type: v as any,
+                            type: v,
                           },
                         },
                       })
@@ -728,14 +728,14 @@ const HeaderSettingPage: React.FC = () => {
                   <Text>Loại</Text>
                   <Select
                     value={settings.background?.scrolled?.type || 'solid'}
-                    onChange={(v) =>
+                    onChange={(v: 'solid' | 'gradient' | 'transparent') =>
                       setSettings({
                         ...settings,
                         background: {
                           ...settings.background,
                           scrolled: {
                             ...(settings.background?.scrolled || {}),
-                            type: v as any,
+                            type: v,
                           },
                         },
                       })

@@ -14,33 +14,35 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // Prevent hydration mismatch by ensuring client-side state
+  // Tránh hydrate mismatch
   useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      setMounted(true);
-    });
+    const id = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Prevent rendering layout until mounted to avoid hydration errors
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
   return (
-    <Layout className="min-h-screen bg-slate-50">
+    <Layout className="h-screen overflow-hidden bg-slate-50">
+      {/* SIDEBAR cố định bên trái */}
       <AdminSidebar collapsed={collapsed} />
+
+      {/* Khu vực bên phải: header + content + footer */}
       <Layout
         className="transition-all duration-300 ease-in-out bg-slate-50"
         style={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
-          // marginLeft: collapsed ? 80 : 200,
+          height: "100vh",
         }}
       >
         <AdminHeader collapsed={collapsed} setCollapsed={setCollapsed} />
-        <Content className="m-6 mt-8 flex-1">{children}</Content>
+
+        {/* CHỈ content được cuộn */}
+        <Content className="m-6 mt-8 flex-1 overflow-y-auto min-h-0">
+          {children}
+        </Content>
+
         <AdminFooter />
       </Layout>
     </Layout>

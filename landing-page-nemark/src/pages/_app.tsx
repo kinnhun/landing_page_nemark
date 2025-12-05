@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { Toaster } from "sonner";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import UserLayout from "@/layouts/UserLayout";
@@ -66,6 +67,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <StyleProvider cache={clientCache} hashPriority="high">
       <ThemeProvider locale="vi">
         <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <Toaster position="top-right" richColors closeButton />
           {/* Loading overlay during route transitions */}
           {isRouteChanging && (
             <div 

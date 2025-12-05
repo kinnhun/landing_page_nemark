@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import type { ThemeConfig } from 'antd';
+import type { Locale } from 'antd/es/locale';
 import viVN from 'antd/locale/vi_VN';
 import enUS from 'antd/locale/en_US';
 
@@ -64,7 +65,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children, locale =
     },
   }), []);
 
-  const antdLocale = useMemo(() => {
+  const antdLocale: Locale = useMemo(() => {
     return locale === 'vi' ? viVN : enUS;
   }, [locale]);
 

@@ -88,6 +88,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
       className="bg-white border-r border-gray-100 z-20 fixed left-0 top-0 bottom-0 h-screen overflow-y-auto scrollbar-hide" 
       width={260}
       theme="light"
+      
     >
       <div className="flex flex-col h-full">
         {/* Logo Section */}

@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Drawer, Dropdown, Space } from 'antd';
 import { MenuOutlined, DownOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import type { MenuItem, HeaderSettings } from '../types/header';
+import { getHeaderSettings } from '../services/headerApi';
 
 const Header: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const [settings, setSettings] = useState<HeaderSettings | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,85 +35,154 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const items: MenuProps['items'] = [
-    { key: '1', label: <a href="#">Tài Nguyên</a> },
-    { 
-      key: '2', 
-      label: 'Danh Mục Con',
-      children: [
-        { key: '2-1', label: <a href="#">Mục Con 1</a> },
-        { key: '2-2', label: <a href="#">Mục Con 2</a> },
-        { key: '2-3', label: <a href="#">Mục Con 3</a> },
-        { key: '2-4', label: <a href="#">Mục Con 4</a> },
-        { key: '2-5', label: <a href="#">Mục Con 5</a> },
-      ]
-    },
-    { key: '3', label: <a href="#">Hỗ Trợ</a> },
-    { key: '4', label: <a href="#">Chính Sách</a> },
-    { key: '5', label: <a href="#">Liên Kết</a> },
+  // Fetch settings from API and re-fetch periodically. Also listen for custom event to update immediately.
+  const fetchSettings = useCallback(async () => {
+    try {
+      const json = await getHeaderSettings();
+      if (!json) return;
+      setSettings(json);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    // initial fetch and polling (defer initial fetch to avoid sync setState in effect)
+    const t = window.setTimeout(() => fetchSettings(), 0);
+
+    const id = window.setInterval(() => fetchSettings(), 15000); // poll every 15s
+
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === 'header_settings_updated') fetchSettings();
+    };
+    const onCustom = () => fetchSettings();
+
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('header_settings_updated', onCustom);
+
+    return () => {
+      clearTimeout(t);
+      clearInterval(id);
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('header_settings_updated', onCustom);
+    };
+  }, [fetchSettings]);
+
+  const menuItemsFromSettings: MenuItem[] = settings?.menu?.items ?? [
+    { id: 'hero', label: 'Trang Chủ', link: '#hero', enabled: true },
+    { id: 'about', label: 'Giới Thiệu', link: '#about', enabled: true },
+    { id: 'services', label: 'Dịch Vụ', link: '#services', enabled: true },
+    { id: 'portfolio', label: 'Dự Án', link: '#portfolio', enabled: true },
+    { id: 'team', label: 'Đội Ngũ', link: '#team', enabled: true }
   ];
 
-  const navLinks = [
-    { href: '#hero', label: 'Trang Chủ', id: 'hero' },
-    { href: '#about', label: 'Giới Thiệu', id: 'about' },
-    { href: '#services', label: 'Dịch Vụ', id: 'services' },
-    { href: '#portfolio', label: 'Dự Án', id: 'portfolio' },
-    { href: '#team', label: 'Đội Ngũ', id: 'team' },
-  ];
+  const navLinks = menuItemsFromSettings.filter((i: MenuItem) => i.enabled !== false);
 
-  const textColorClass = scrolled ? 'text-gray-800' : 'text-white';
-  const hoverColorClass = scrolled ? 'hover:text-blue-600' : 'hover:text-blue-300';
-  const activeColorClass = scrolled ? 'text-blue-600' : 'text-blue-300';
+  const dropdownItemsFor = (children: MenuItem[] | undefined): MenuProps['items'] => {
+    if (!children || !children.length) return [];
+    return children.map((c: MenuItem) => ({ key: c.id, label: <a href={c.link || '#'}>{c.label}</a>, children: c.children ? dropdownItemsFor(c.children) : undefined }));
+  };
+
+  // Compute colors from settings (fall back to existing defaults)
+  const defaultTextColor = settings?.text?.defaultColor ?? (scrolled ? '#1f2937' : '#ffffff');
+  const hoverColor = settings?.text?.hoverColor ?? (scrolled ? '#2563eb' : '#7dd3fc');
+  const activeColor = settings?.text?.activeColor ?? (scrolled ? '#2563eb' : '#7dd3fc');
+
+  const logoSrc: string = (scrolled && settings?.logo?.scrolledUrl) ? settings.logo!.scrolledUrl! : (settings?.logo?.url ?? '/favicon.ico');
+
+  const buildBackground = (variant: import('../types/header').BackgroundVariant | undefined) => {
+    if (!variant) return undefined;
+    const opacity = typeof variant.opacity === 'number' ? variant.opacity : 1;
+    if (variant.type === 'transparent') return 'transparent';
+    if (variant.type === 'gradient') {
+      const from = variant.gradientFrom ?? '#000000';
+      const to = variant.gradientTo ?? '#ffffff';
+      const angle = variant.gradientAngle ?? 90;
+      return `linear-gradient(${angle}deg, ${from}, ${to})`;
+    }
+    // solid
+    const color = variant.color ?? '#ffffff';
+    // apply opacity by using rgba if color is hex
+    // very simple hex -> rgba conversion for 6-hex colors
+    const hex = color.replace('#', '');
+    if (/^[0-9A-Fa-f]{6}$/.test(hex)) {
+      const r = parseInt(hex.substring(0,2),16);
+      const g = parseInt(hex.substring(2,4),16);
+      const b = parseInt(hex.substring(4,6),16);
+      return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    // fallback, return color as-is
+    return color;
+  };
 
   return (
-    <header 
-      id="header" 
-      className={`fixed w-full z-50 transition-all duration-500 py-4 ${
-        scrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
-      }`}
+    <header
+      id="header"
+      className={`fixed w-full z-50 transition-all duration-500`}
+      style={{
+        padding: settings?.size?.padding ?? undefined,
+        background: (() => {
+          const variant = scrolled ? settings?.background?.scrolled : settings?.background?.initial;
+          return buildBackground(variant) ?? undefined;
+        })(),
+        backdropFilter: (() => {
+          const variant = scrolled ? settings?.background?.scrolled : settings?.background?.initial;
+          return variant?.blur ? `blur(${variant.blur}px)` : undefined;
+        })(),
+        boxShadow: (() => {
+          const variant = scrolled ? settings?.background?.scrolled : settings?.background?.initial;
+          return variant?.shadow ? '0 1px 8px rgba(0,0,0,0.08)' : undefined;
+        })(),
+      }}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link href="/" className="flex items-center no-underline group">
-          <h1 className={`text-3xl font-bold uppercase m-0 transition-colors duration-300 ${
-            scrolled ? 'text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500' : 'text-white'
-          }`}>Nemark</h1>
+          <Image
+            src={logoSrc}
+            alt="logo"
+            width={settings?.logo?.width ?? 140}
+            height={settings?.logo?.height ?? 40}
+            style={{ objectFit: 'contain' }}
+          />
         </Link>
 
         {/* Desktop Nav */}
         <nav className="hidden xl:flex items-center gap-8">
-          <ul className={`flex m-0 p-0 list-none gap-6 items-center ${textColorClass}`}>
-            {navLinks.map(link => (
+          <ul className={`flex m-0 p-0 list-none gap-6 items-center`}>
+            {navLinks.map((link: MenuItem) => (
               <li key={link.id}>
-                <a 
-                  href={link.href} 
-                  className={`text-sm font-medium uppercase no-underline transition-colors duration-300 ${
-                    activeSection === link.id ? activeColorClass : `${textColorClass} ${hoverColorClass}`
-                  }`}
-                >
-                  {link.label}
-                </a>
+                {link.children && link.children.length ? (
+                  <Dropdown menu={{ items: dropdownItemsFor(link.children) }} trigger={['hover']}>
+                    <a onClick={(e) => e.preventDefault()} style={{ color: defaultTextColor }} className={`cursor-pointer flex items-center gap-1 text-sm font-medium uppercase transition-all duration-300`}>
+                      <Space>
+                        {link.label}
+                        <DownOutlined className="text-xs" />
+                      </Space>
+                    </a>
+                  </Dropdown>
+                ) : (
+                  <a
+                    href={link.link || '#'}
+                    onMouseEnter={() => setHovered(link.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    style={{
+                      color: activeSection === link.id ? activeColor : hovered === link.id ? hoverColor : defaultTextColor
+                    }}
+                    className={`text-sm font-medium uppercase no-underline transition-all duration-300`}
+                  >
+                    {link.label}
+                  </a>
+                )}
               </li>
             ))}
-            
-            <li>
-              <Dropdown menu={{ items }} trigger={['hover']}>
-                <a onClick={(e) => e.preventDefault()} className={`${textColorClass} ${hoverColorClass} cursor-pointer flex items-center gap-1 text-sm font-medium uppercase transition-colors duration-300`}>
-                  <Space>
-                    Thêm
-                    <DownOutlined className="text-xs" />
-                  </Space>
-                </a>
-              </Dropdown>
-            </li>
 
             <li>
-              <a 
-                href="#contact" 
-                className={`text-sm font-medium uppercase no-underline transition-colors duration-300 ${
-                  activeSection === 'contact' ? activeColorClass : `${textColorClass} ${hoverColorClass}`
-                }`}
+              <a
+                href={settings?.cta?.link ?? '#contact'}
+                style={{ color: activeSection === 'contact' ? activeColor : defaultTextColor }}
+                className={`text-sm font-medium uppercase no-underline transition-all duration-300`}
               >
-                Liên Hệ
+                {settings?.cta?.label ?? 'Liên Hệ'}
               </a>
             </li>
           </ul>
@@ -116,44 +190,44 @@ const Header: React.FC = () => {
 
         {/* Mobile Nav Toggle */}
         <div className="xl:hidden">
-            <MenuOutlined 
-                className={`${textColorClass} text-2xl cursor-pointer transition-colors duration-300`} 
-                onClick={() => setMobileMenuOpen(true)}
-            />
+          <MenuOutlined
+            style={{ color: settings?.mobile?.iconColor ?? (scrolled ? '#111827' : '#fff') }}
+            className={`text-2xl cursor-pointer transition-all duration-300`}
+            onClick={() => setMobileMenuOpen(true)}
+          />
         </div>
 
         <Drawer
-            title={<span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-bold text-xl">NEMARK</span>}
-            placement="right"
-            onClose={() => setMobileMenuOpen(false)}
-            open={mobileMenuOpen}
+          title={<span style={{ color: settings?.text?.defaultColor ?? '#0ea5a3', fontWeight: 700, fontSize: 18 }}>NEMARK</span>}
+          placement="right"
+          onClose={() => setMobileMenuOpen(false)}
+          open={mobileMenuOpen}
+          bodyStyle={{ background: settings?.mobile?.drawerBg ?? '#fff' }}
         >
-            <ul className="flex flex-col gap-4 list-none p-0 m-0">
-                {navLinks.map(link => (
-                    <li key={link.id}>
-                        <a 
-                            href={link.href} 
-                            className={`text-lg font-medium block transition-colors duration-300 ${
-                              activeSection === link.id ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                            }`}
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            {link.label}
-                        </a>
-                    </li>
-                ))}
-                 <li>
-                    <a 
-                      href="#contact" 
-                      className={`text-lg font-medium block transition-colors duration-300 ${
-                        activeSection === 'contact' ? 'text-blue-600' : 'text-gray-800 hover:text-blue-600'
-                      }`}
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Liên Hệ
-                    </a>
-                </li>
-            </ul>
+          <ul className="flex flex-col gap-4 list-none p-0 m-0">
+            {navLinks.map((link: MenuItem) => (
+              <li key={link.id}>
+                <a
+                  href={link.link || '#'}
+                  style={{ color: activeSection === link.id ? activeColor : settings?.mobile?.textColor ?? '#111827' }}
+                  className={`text-lg font-medium block transition-all duration-300`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+             <li>
+              <a
+                href={settings?.cta?.link ?? '#contact'}
+                style={{ color: activeSection === 'contact' ? activeColor : settings?.mobile?.textColor ?? '#111827' }}
+                className={`text-lg font-medium block transition-all duration-300`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {settings?.cta?.label ?? 'Liên Hệ'}
+              </a>
+            </li>
+          </ul>
         </Drawer>
 
       </div>

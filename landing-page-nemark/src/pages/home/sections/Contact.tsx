@@ -115,12 +115,22 @@ const Contact = () => {
         }),
       });
 
-      if (response.ok) {
-        message.success('Gửi tin nhắn thành công!');
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        message.success(result.message || 'Gửi tin nhắn thành công!');
         (e.target as HTMLFormElement).reset();
       } else {
-        const error = await response.json();
-        message.error(error.message || 'Có lỗi xảy ra khi gửi tin nhắn');
+        // Show error message
+        let errorMsg = result.message || 'Có lỗi xảy ra khi gửi tin nhắn';
+        
+        // If there are instructions, show them in console and a more detailed message
+        if (result.instructions && Array.isArray(result.instructions)) {
+          console.error('Hướng dẫn cấu hình Google Sheets:', result.instructions);
+          errorMsg += '\n\nVui lòng kiểm tra console để xem hướng dẫn chi tiết.';
+        }
+        
+        message.error(errorMsg);
       }
     } catch (err) {
       console.error('Error submitting form:', err);

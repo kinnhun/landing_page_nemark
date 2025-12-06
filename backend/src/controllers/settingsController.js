@@ -404,6 +404,48 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/contact
+   * @desc    Get contact settings
+   * @access  Public
+   */
+  async getContactSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getContactSettings();
+      return response.success(res, settings, 'Contact settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/contact
+   * @desc    Update contact settings
+   * @access  Public (should be protected in production)
+   */
+  async updateContactSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updateContactSettings(req.body);
+      return response.success(res, settings, 'Contact settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/contact/reset
+   * @desc    Reset contact settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetContactSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetContactSettings();
+      return response.success(res, settings, 'Contact settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

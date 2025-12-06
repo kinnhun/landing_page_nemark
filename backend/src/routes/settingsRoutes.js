@@ -48,6 +48,11 @@ router.get('/team', settingsController.getTeamSettings);
 router.post('/team', settingsController.updateTeamSettings);
 router.post('/team/reset', settingsController.resetTeamSettings);
 
+// Contact settings routes
+router.get('/contact', settingsController.getContactSettings);
+router.post('/contact', settingsController.updateContactSettings);
+router.post('/contact/reset', settingsController.resetContactSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

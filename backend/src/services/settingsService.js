@@ -636,6 +636,105 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get contact settings
+   */
+  async getContactSettings() {
+    try {
+      const settings = await settingsModel.getContactSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting contact settings:', err);
+      throw new InternalError('Failed to get contact settings');
+    }
+  }
+
+  /**
+   * Update contact settings
+   */
+  async updateContactSettings(data) {
+    try {
+      // Validate data
+      this.validateContactSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateContactSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating contact settings:', err);
+      throw new InternalError('Failed to update contact settings');
+    }
+  }
+
+  /**
+   * Reset contact settings to default
+   */
+  async resetContactSettings() {
+    try {
+      const reset = await settingsModel.resetContactSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting contact settings:', err);
+      throw new InternalError('Failed to reset contact settings');
+    }
+  }
+
+  /**
+   * Validate contact settings data
+   */
+  validateContactSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    // Validate title
+    if (data.title && typeof data.title !== 'string') {
+      throw new ValidationError('Title must be a string');
+    }
+
+    // Validate contactInfo
+    if (data.contactInfo && !Array.isArray(data.contactInfo)) {
+      throw new ValidationError('ContactInfo must be an array');
+    }
+
+    if (data.contactInfo && data.contactInfo.length > 0) {
+      data.contactInfo.forEach((info, index) => {
+        if (!info.id || !info.type || !info.label || !info.value) {
+          throw new ValidationError(`Invalid contactInfo at index ${index}: must have id, type, label, and value`);
+        }
+        if (!['address', 'phone', 'email', 'custom'].includes(info.type)) {
+          throw new ValidationError(`Invalid contactInfo type at index ${index}: must be address, phone, email, or custom`);
+        }
+      });
+    }
+
+    // Validate formFields
+    if (data.formFields && !Array.isArray(data.formFields)) {
+      throw new ValidationError('FormFields must be an array');
+    }
+
+    if (data.formFields && data.formFields.length > 0) {
+      data.formFields.forEach((field, index) => {
+        if (!field.id || !field.name || !field.label || !field.type) {
+          throw new ValidationError(`Invalid formField at index ${index}: must have id, name, label, and type`);
+        }
+        if (!['text', 'email', 'tel', 'textarea', 'select', 'number'].includes(field.type)) {
+          throw new ValidationError(`Invalid formField type at index ${index}: must be text, email, tel, textarea, select, or number`);
+        }
+      });
+    }
+
+    // Validate contactInfoColumns (1-3)
+    if (data.contactInfoColumns !== undefined && (typeof data.contactInfoColumns !== 'number' || data.contactInfoColumns < 1 || data.contactInfoColumns > 3)) {
+      throw new ValidationError('ContactInfoColumns must be a number between 1 and 3');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

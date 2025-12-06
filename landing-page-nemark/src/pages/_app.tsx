@@ -4,11 +4,13 @@ import type { AppProps } from "next/app";
 import { Geist, Geist_Mono } from "next/font/google";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Toaster } from "sonner";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import UserLayout from "@/layouts/UserLayout";
+import { queryClient } from "@/lib/queryClient";
 
 const geistSans = Geist({ 
   variable: "--font-geist-sans", 
@@ -64,40 +66,42 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router]);
 
   return (
-    <StyleProvider cache={clientCache} hashPriority="high">
-      <ThemeProvider locale="vi">
-        <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Toaster position="top-right" richColors closeButton />
-          {/* Loading overlay during route transitions */}
-          {isRouteChanging && (
-            <div 
-              style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '3px',
-                background: 'linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #2563eb 100%)',
-                backgroundSize: '200% 100%',
-                animation: 'loading 1.5s ease-in-out infinite',
-                zIndex: 9999,
-              }}
-            />
-          )}
-          
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-          
-          {/* Loading animation keyframes */}
-          <style jsx global>{`
-            @keyframes loading {
-              0% { background-position: 200% 0; }
-              100% { background-position: -200% 0; }
-            }
-          `}</style>
-        </div>
-      </ThemeProvider>
-    </StyleProvider>
+    <QueryClientProvider client={queryClient}>
+      <StyleProvider cache={clientCache} hashPriority="high">
+        <ThemeProvider locale="vi">
+          <div className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <Toaster position="top-right" richColors closeButton />
+            {/* Loading overlay during route transitions */}
+            {isRouteChanging && (
+              <div 
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #2563eb 0%, #3b82f6 50%, #2563eb 100%)',
+                  backgroundSize: '200% 100%',
+                  animation: 'loading 1.5s ease-in-out infinite',
+                  zIndex: 9999,
+                }}
+              />
+            )}
+            
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+            
+            {/* Loading animation keyframes */}
+            <style jsx global>{`
+              @keyframes loading {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+              }
+            `}</style>
+          </div>
+        </ThemeProvider>
+      </StyleProvider>
+    </QueryClientProvider>
   );
 }

@@ -315,6 +315,63 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get CTA settings
+   */
+  async getCtaSettings() {
+    try {
+      const settings = await settingsModel.getCtaSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting CTA settings:', err);
+      throw new InternalError('Failed to retrieve CTA settings');
+    }
+  }
+
+  /**
+   * Update CTA settings
+   */
+  async updateCtaSettings(data) {
+    try {
+      // Validate data
+      this.validateCtaSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateCtaSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating CTA settings:', err);
+      throw new InternalError('Failed to update CTA settings');
+    }
+  }
+
+  /**
+   * Reset CTA settings to default
+   */
+  async resetCtaSettings() {
+    try {
+      const reset = await settingsModel.resetCtaSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting CTA settings:', err);
+      throw new InternalError('Failed to reset CTA settings');
+    }
+  }
+
+  /**
+   * Validate CTA settings data
+   */
+  validateCtaSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

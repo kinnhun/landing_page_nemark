@@ -28,6 +28,11 @@ router.get('/services', settingsController.getServicesSettings);
 router.post('/services', settingsController.updateServicesSettings);
 router.post('/services/reset', settingsController.resetServicesSettings);
 
+// CTA settings routes
+router.get('/cta', settingsController.getCtaSettings);
+router.post('/cta', settingsController.updateCtaSettings);
+router.post('/cta/reset', settingsController.resetCtaSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

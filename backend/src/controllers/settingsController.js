@@ -236,6 +236,48 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/cta
+   * @desc    Get CTA settings
+   * @access  Public
+   */
+  async getCtaSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getCtaSettings();
+      return response.success(res, settings, 'CTA settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/cta
+   * @desc    Update CTA settings
+   * @access  Public (should be protected in production)
+   */
+  async updateCtaSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updateCtaSettings(req.body);
+      return response.success(res, settings, 'CTA settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/cta/reset
+   * @desc    Reset CTA settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetCtaSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetCtaSettings();
+      return response.success(res, settings, 'CTA settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

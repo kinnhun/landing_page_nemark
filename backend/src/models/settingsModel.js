@@ -10,6 +10,7 @@ class SettingsModel {
     this.aboutFileName = 'about-settings.json';
     this.statsFileName = 'stats-settings.json';
     this.servicesFileName = 'services-settings.json';
+    this.ctaFileName = 'cta-settings.json';
     
     this.defaultHeaderSettings = {
       menu: {
@@ -150,6 +151,31 @@ class SettingsModel {
           link: '#'
         }
       ]
+    };
+
+    this.defaultCtaSettings = {
+      title: 'Đồng Hành Cùng Nemark Trong Hành Trình Chuyển Đổi Số',
+      description: 'Bạn đang cần một website chuyên nghiệp, phần mềm quản lý linh hoạt hay giải pháp AI tự động hóa quy trình? Nemark sẵn sàng hỗ trợ và xây dựng giải pháp phù hợp nhất cho doanh nghiệp của bạn.',
+      backgroundImage: '/assets/img/cta-bg.jpg',
+      background: {
+        type: 'gradient',
+        gradientFrom: '#2563eb', // blue-600
+        gradientTo: '#14b8a6',   // teal-500
+        opacity: 1
+      },
+      overlay: {
+        enabled: true,
+        opacity: 0.1
+      },
+      button: {
+        label: 'Liên Hệ Ngay',
+        link: '#contact',
+        visible: true,
+        backgroundColor: '#ffffff',
+        textColor: '#2563eb',
+        hoverBackgroundColor: '#f3f4f6',
+        hoverTextColor: '#2563eb'
+      }
     };
   }
 
@@ -320,6 +346,40 @@ class SettingsModel {
    */
   async resetServicesSettings() {
     return await storage.write(this.servicesFileName, this.defaultServicesSettings);
+  }
+
+  /**
+   * Get CTA settings
+   */
+  async getCtaSettings() {
+    const settings = await storage.read(this.ctaFileName);
+    if (!settings) return this.defaultCtaSettings;
+    
+    return {
+      ...this.defaultCtaSettings,
+      ...settings,
+      background: { ...this.defaultCtaSettings.background, ...settings.background },
+      overlay: { ...this.defaultCtaSettings.overlay, ...settings.overlay },
+      button: { ...this.defaultCtaSettings.button, ...settings.button }
+    };
+  }
+
+  /**
+   * Update CTA settings
+   */
+  async updateCtaSettings(data) {
+    const toSave = {
+      ...data,
+      lastUpdated: Date.now()
+    };
+    return await storage.write(this.ctaFileName, toSave);
+  }
+
+  /**
+   * Reset CTA settings
+   */
+  async resetCtaSettings() {
+    return await storage.write(this.ctaFileName, this.defaultCtaSettings);
   }
 }
 

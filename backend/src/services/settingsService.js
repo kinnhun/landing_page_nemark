@@ -372,6 +372,99 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get portfolio settings
+   */
+  async getPortfolioSettings() {
+    try {
+      const settings = await settingsModel.getPortfolioSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting portfolio settings:', err);
+      throw new InternalError('Failed to retrieve portfolio settings');
+    }
+  }
+
+  /**
+   * Update portfolio settings
+   */
+  async updatePortfolioSettings(data) {
+    try {
+      // Validate data
+      this.validatePortfolioSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updatePortfolioSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating portfolio settings:', err);
+      throw new InternalError('Failed to update portfolio settings');
+    }
+  }
+
+  /**
+   * Reset portfolio settings to default
+   */
+  async resetPortfolioSettings() {
+    try {
+      const reset = await settingsModel.resetPortfolioSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting portfolio settings:', err);
+      throw new InternalError('Failed to reset portfolio settings');
+    }
+  }
+
+  /**
+   * Validate portfolio settings data
+   */
+  validatePortfolioSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    // Validate title
+    if (data.title && typeof data.title !== 'string') {
+      throw new ValidationError('Title must be a string');
+    }
+
+    // Validate categories
+    if (data.categories && !Array.isArray(data.categories)) {
+      throw new ValidationError('Categories must be an array');
+    }
+
+    if (data.categories && data.categories.length > 0) {
+      data.categories.forEach((cat, index) => {
+        if (!cat.key || !cat.label) {
+          throw new ValidationError(`Invalid category at index ${index}: must have key and label`);
+        }
+      });
+    }
+
+    // Validate items
+    if (data.items && !Array.isArray(data.items)) {
+      throw new ValidationError('Items must be an array');
+    }
+
+    if (data.items && data.items.length > 0) {
+      data.items.forEach((item, index) => {
+        if (!item.id || !item.title || !item.category) {
+          throw new ValidationError(`Invalid item at index ${index}: must have id, title, and category`);
+        }
+      });
+    }
+
+    // Validate columns
+    if (data.columns !== undefined && (typeof data.columns !== 'number' || data.columns < 1 || data.columns > 4)) {
+      throw new ValidationError('Columns must be a number between 1 and 4');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

@@ -33,6 +33,11 @@ router.get('/cta', settingsController.getCtaSettings);
 router.post('/cta', settingsController.updateCtaSettings);
 router.post('/cta/reset', settingsController.resetCtaSettings);
 
+// Portfolio settings routes
+router.get('/portfolio', settingsController.getPortfolioSettings);
+router.post('/portfolio', settingsController.updatePortfolioSettings);
+router.post('/portfolio/reset', settingsController.resetPortfolioSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

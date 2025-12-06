@@ -278,6 +278,48 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/portfolio
+   * @desc    Get portfolio settings
+   * @access  Public
+   */
+  async getPortfolioSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getPortfolioSettings();
+      return response.success(res, settings, 'Portfolio settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/portfolio
+   * @desc    Update portfolio settings
+   * @access  Public (should be protected in production)
+   */
+  async updatePortfolioSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updatePortfolioSettings(req.body);
+      return response.success(res, settings, 'Portfolio settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/portfolio/reset
+   * @desc    Reset portfolio settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetPortfolioSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetPortfolioSettings();
+      return response.success(res, settings, 'Portfolio settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

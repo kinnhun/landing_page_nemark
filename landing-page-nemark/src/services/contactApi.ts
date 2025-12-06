@@ -104,8 +104,8 @@ export const getContactSettings = async (): Promise<ContactSettings> => {
           }
         }
       ],
-      formAction: '#',
-      formMethod: 'post',
+      googleSheetUrl: '',
+      googleSheetTabName: 'Sheet1',
       submitButtonText: 'Gửi Tin Nhắn',
       visible: true,
       showContactInfo: true,

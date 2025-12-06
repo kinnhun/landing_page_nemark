@@ -436,8 +436,8 @@ class SettingsModel {
           }
         }
       ],
-      formAction: '#',
-      formMethod: 'post',
+      googleSheetUrl: '',
+      googleSheetTabName: 'Sheet1',
       submitButtonText: 'Gửi Tin Nhắn',
       visible: true,
       showContactInfo: true,

@@ -512,31 +512,24 @@ const ContactSettingPage: React.FC = () => {
                     }
                   />
                 </Form.Item>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Form.Item label="Form Action URL">
-                      <Input
-                        value={settings.formAction || '#'}
-                        onChange={(e) =>
-                          setSettings({ ...settings, formAction: e.target.value })
-                        }
-                        placeholder="#"
-                      />
-                    </Form.Item>
-                  </Col>
-                  <Col span={12}>
-                    <Form.Item label="Form Method">
-                      <Select
-                        value={settings.formMethod || 'post'}
-                        onChange={(v) => setSettings({ ...settings, formMethod: v })}
-                        style={{ width: "100%" }}
-                      >
-                        <Option value="post">POST</Option>
-                        <Option value="get">GET</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>
+                <Form.Item label="Link Google Sheet">
+                  <Input
+                    value={settings.googleSheetUrl || ''}
+                    onChange={(e) =>
+                      setSettings({ ...settings, googleSheetUrl: e.target.value })
+                    }
+                    placeholder="https://docs.google.com/spreadsheets/d/..."
+                  />
+                </Form.Item>
+                <Form.Item label="Tên tab trong Google Sheet">
+                  <Input
+                    value={settings.googleSheetTabName || 'Sheet1'}
+                    onChange={(e) =>
+                      setSettings({ ...settings, googleSheetTabName: e.target.value })
+                    }
+                    placeholder="Sheet1"
+                  />
+                </Form.Item>
                 <Form.Item label="Text nút gửi">
                   <Input
                     value={settings.submitButtonText || 'Gửi Tin Nhắn'}

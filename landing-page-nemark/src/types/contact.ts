@@ -31,8 +31,8 @@ export type ContactSettings = {
   description?: string;
   contactInfo?: ContactInfo[]; // List of contact info cards
   formFields?: ContactFormField[]; // List of form fields
-  formAction?: string; // Form action URL
-  formMethod?: 'post' | 'get';
+  googleSheetUrl?: string; // Google Sheet URL
+  googleSheetTabName?: string; // Google Sheet tab name
   submitButtonText?: string;
   // Display settings
   visible?: boolean; // Show/hide entire section

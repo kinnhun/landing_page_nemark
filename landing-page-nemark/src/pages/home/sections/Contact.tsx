@@ -3,10 +3,12 @@ import { EnvironmentOutlined, PhoneOutlined, MailOutlined } from '@ant-design/ic
 import { Reveal, StaggerContainer, StaggerItem } from '@/components/Reveal';
 import { getContactSettings } from '@/services/contactApi';
 import type { ContactSettings, ContactInfo, ContactFormField } from '@/types/contact';
+import { message } from 'antd';
 
 const Contact = () => {
   const [settings, setSettings] = useState<ContactSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const fetchContactData = useCallback(async () => {
     try {
@@ -62,6 +64,71 @@ const Contact = () => {
 
   const contactInfo = (settings.contactInfo || []).filter(info => info.enabled !== false);
   const formFields = (settings.formFields || []).filter(field => field.enabled !== false);
+
+  // Handle form submission to Google Sheet
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!settings?.googleSheetUrl) {
+      message.error('Chưa cấu hình Google Sheet URL');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const data: Record<string, string> = {};
+      
+      // Collect form data
+      formFields.forEach((field) => {
+        const value = formData.get(field.name) as string;
+        if (value) {
+          data[field.label] = value;
+        }
+      });
+
+      // Extract Google Sheet ID from URL
+      // Format: https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit
+      const sheetUrl = settings.googleSheetUrl;
+      const sheetIdMatch = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      
+      if (!sheetIdMatch) {
+        message.error('Google Sheet URL không hợp lệ');
+        setSubmitting(false);
+        return;
+      }
+
+      const sheetId = sheetIdMatch[1];
+      const tabName = settings.googleSheetTabName || 'Sheet1';
+
+      // Send data to backend API to save to Google Sheet
+      const response = await fetch('/api/contact/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sheetId,
+          tabName,
+          data,
+        }),
+      });
+
+      if (response.ok) {
+        message.success('Gửi tin nhắn thành công!');
+        (e.target as HTMLFormElement).reset();
+      } else {
+        const error = await response.json();
+        message.error(error.message || 'Có lỗi xảy ra khi gửi tin nhắn');
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      message.error('Có lỗi xảy ra khi gửi tin nhắn');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Get icon for contact info type
   const getIconForType = (type: string) => {
@@ -221,8 +288,7 @@ const Contact = () => {
             <div className={settings.showContactInfo !== false && contactInfo.length > 0 ? "lg:w-2/3" : "lg:w-full"}>
               <Reveal width="100%" delay={0.4}>
                 <form
-                  action={settings.formAction || '#'}
-                  method={settings.formMethod || 'post'}
+                  onSubmit={handleFormSubmit}
                   className="bg-white p-8 shadow-sm rounded-lg border border-gray-100"
                 >
                   {/* Half-width fields in grid */}
@@ -246,9 +312,10 @@ const Contact = () => {
                   <div className="text-center">
                     <button
                       type="submit"
-                      className="bg-linear-to-r from-blue-600 to-teal-500 text-white px-8 py-3 rounded hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium"
+                      disabled={submitting}
+                      className="bg-linear-to-r from-blue-600 to-teal-500 text-white px-8 py-3 rounded hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {settings.submitButtonText || 'Gửi Tin Nhắn'}
+                      {submitting ? 'Đang gửi...' : (settings.submitButtonText || 'Gửi Tin Nhắn')}
                     </button>
                   </div>
                 </form>

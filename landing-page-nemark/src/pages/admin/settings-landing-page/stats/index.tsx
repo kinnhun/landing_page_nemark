@@ -42,12 +42,15 @@ const StatsSettingsPage: React.FC = () => {
   const onFinish = async (values: StatsSettings) => {
     setSaving(true);
     try {
-      await updateStatsSettings(values);
+      const updatedData = await updateStatsSettings(values);
       notifyCustom("success", { title: "Đã lưu cài đặt" });
+      
+      // Update form with the response data
+      form.setFieldsValue(updatedData);
       
       // Broadcast update
       const channel = new BroadcastChannel('app-settings');
-      channel.postMessage({ type: 'stats-updated', data: values });
+      channel.postMessage({ type: 'stats-updated', data: updatedData });
       channel.close();
     } catch (error) {
       console.error("Failed to save stats settings:", error);

@@ -11,6 +11,7 @@ const Stats = () => {
     { label: 'Giờ Hỗ Trợ Kỹ Thuật', value: 1453 },
     { label: 'Thành Viên Đội Ngũ', value: 32 }
   ]);
+  const [key, setKey] = useState(0);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -18,6 +19,7 @@ const Stats = () => {
         const data = await getStatsSettings();
         if (data && data.stats) {
           setStats(data.stats);
+          setKey(prev => prev + 1);
         }
       } catch (error) {
         console.error('Failed to fetch stats:', error);
@@ -31,6 +33,7 @@ const Stats = () => {
     channel.onmessage = (event) => {
       if (event.data.type === 'stats-updated' && event.data.data) {
         setStats(event.data.data.stats);
+        setKey(prev => prev + 1);
       }
     };
 
@@ -40,7 +43,7 @@ const Stats = () => {
   }, []);
 
   return (
-    <section id="stats" className="py-16 bg-gray-50 scroll-mt-20">
+    <section key={key} id="stats" className="py-16 bg-gray-50 scroll-mt-20">
       <div className="container mx-auto px-4">
         
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

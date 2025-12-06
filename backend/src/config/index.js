@@ -10,10 +10,15 @@ const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   
   // CORS configuration
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true
-  },
+  // In development allow the request origin to simplify local testing (keeps credentials support).
+  // In production restrict to FRONTEND_URL if provided.
+  cors: (() => {
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    if ((process.env.NODE_ENV || 'development') === 'development') {
+      return { origin: true, credentials: true };
+    }
+    return { origin: frontendUrl, credentials: true };
+  })(),
   
   // Data storage paths
   dataDir: path.join(__dirname, '../../data'),

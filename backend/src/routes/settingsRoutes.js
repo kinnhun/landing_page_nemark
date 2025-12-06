@@ -23,6 +23,11 @@ router.get('/stats', settingsController.getStatsSettings);
 router.post('/stats', settingsController.updateStatsSettings);
 router.post('/stats/reset', settingsController.resetStatsSettings);
 
+// Services settings routes
+router.get('/services', settingsController.getServicesSettings);
+router.post('/services', settingsController.updateServicesSettings);
+router.post('/services/reset', settingsController.resetServicesSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

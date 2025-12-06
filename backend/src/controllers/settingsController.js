@@ -194,6 +194,48 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/services
+   * @desc    Get services settings
+   * @access  Public
+   */
+  async getServicesSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getServicesSettings();
+      return response.success(res, settings, 'Services settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/services
+   * @desc    Update services settings
+   * @access  Public (should be protected in production)
+   */
+  async updateServicesSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updateServicesSettings(req.body);
+      return response.success(res, settings, 'Services settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/services/reset
+   * @desc    Reset services settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetServicesSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetServicesSettings();
+      return response.success(res, settings, 'Services settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

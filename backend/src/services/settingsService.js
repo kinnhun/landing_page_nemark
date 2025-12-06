@@ -254,6 +254,67 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get services settings
+   */
+  async getServicesSettings() {
+    try {
+      const settings = await settingsModel.getServicesSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting services settings:', err);
+      throw new InternalError('Failed to retrieve services settings');
+    }
+  }
+
+  /**
+   * Update services settings
+   */
+  async updateServicesSettings(data) {
+    try {
+      // Validate data
+      this.validateServicesSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateServicesSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating services settings:', err);
+      throw new InternalError('Failed to update services settings');
+    }
+  }
+
+  /**
+   * Reset services settings to default
+   */
+  async resetServicesSettings() {
+    try {
+      const reset = await settingsModel.resetServicesSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting services settings:', err);
+      throw new InternalError('Failed to reset services settings');
+    }
+  }
+
+  /**
+   * Validate services settings data
+   */
+  validateServicesSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+    
+    if (data.items && !Array.isArray(data.items)) {
+      throw new ValidationError('Items must be an array');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

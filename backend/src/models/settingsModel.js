@@ -21,6 +21,12 @@ class SettingsModel {
         link: '#contact',
         visible: true
       },
+      logo: {
+        url: '',
+        scrolledUrl: '',
+        width: 120,
+        height: 40
+      },
       background: {
         initial: {
           type: 'solid',
@@ -54,7 +60,21 @@ class SettingsModel {
    */
   async getHeaderSettings() {
     const settings = await storage.read(this.fileName);
-    return settings || this.defaultSettings;
+    if (!settings) return this.defaultSettings;
+    
+    // Merge with defaults to ensure all fields exist
+    return {
+      ...this.defaultSettings,
+      ...settings,
+      menu: settings.menu || this.defaultSettings.menu,
+      cta: { ...this.defaultSettings.cta, ...settings.cta },
+      logo: { ...this.defaultSettings.logo, ...settings.logo },
+      background: {
+        initial: { ...this.defaultSettings.background.initial, ...settings.background?.initial },
+        scrolled: { ...this.defaultSettings.background.scrolled, ...settings.background?.scrolled }
+      },
+      text: { ...this.defaultSettings.text, ...settings.text }
+    };
   }
 
   /**

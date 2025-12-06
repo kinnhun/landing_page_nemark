@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Row,
   Col,
@@ -22,6 +22,7 @@ import {
 import type { DataNode } from 'antd/es/tree';
 import Image from 'next/image';
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import Cropper, { Area } from 'react-easy-crop';
 
 import type { MenuItem, HeaderSettings } from '../../../../types/header';
 import { getHeaderSettings, saveHeaderSettings } from '../../../../services/headerApi';
@@ -29,6 +30,9 @@ import { notifyCustom } from '../../../../components/notificationsCustom';
 
 const { Text } = Typography;
 const { Option } = Select;
+
+// Use Cropper directly in JSX
+// (we'll reference `Cropper` imported from 'react-easy-crop' below)
 
 /* ------------------------------------------------
  *  HẰNG SỐ & HÀM TIỆN ÍCH
@@ -110,6 +114,21 @@ const HeaderSettingPage: React.FC = () => {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [form] = Form.useForm();
+  // crop modal state
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
+  const cropperRef = useRef<HTMLDivElement | null>(null);
+  const [cropOutputWidth, setCropOutputWidth] = useState<number>(120);
+  const [cropOutputHeight, setCropOutputHeight] = useState<number>(40);
+
+  // Khóa tỉ lệ theo kích thước đầu ra để tránh aspect = 0
+  const cropAspect =
+    cropOutputWidth > 0 && cropOutputHeight > 0
+      ? cropOutputWidth / cropOutputHeight
+      : 3; // mặc định header 3:1
 
   // Lấy dữ liệu ban đầu
   useEffect(() => {
@@ -126,6 +145,12 @@ const HeaderSettingPage: React.FC = () => {
           label: s.cta?.label || 'Liên Hệ',
           link: s.cta?.link || '#contact',
           visible: s.cta?.visible !== false,
+        },
+        logo: {
+          url: s.logo?.url || '',
+          scrolledUrl: s.logo?.scrolledUrl || '',
+          width: s.logo?.width ?? 120,
+          height: s.logo?.height ?? 40,
         },
         background: {
           initial: {
@@ -350,22 +375,155 @@ const HeaderSettingPage: React.FC = () => {
 
   /* ----------------- UPLOAD LOGO ----------------- */
 
-  const uploadProps = {
-    beforeUpload: (file: File) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const url = String(e.target?.result || '');
-        setSettings((prev) => ({
-          ...(prev || {}),
-          logo: { ...(prev?.logo || {}), url },
-        }));
-      };
-      reader.readAsDataURL(file);
-      return false;
-    },
-    showUploadList: false,
-    accept: 'image/*',
-  };
+const uploadProps = {
+  beforeUpload: (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const url = String(e.target?.result || '');
+
+      // lấy kích thước hiện tại hoặc set mặc định
+      const currentWidth = settings?.logo?.width ?? 120;
+      const currentHeight = settings?.logo?.height ?? 40;
+
+      // cập nhật settings.logo
+      setSettings((prev: HeaderSettings | null) => ({
+        ...(prev || {}),
+        logo: {
+          ...(prev?.logo || {}),
+          url,
+          width: currentWidth,
+          height: currentHeight,
+        },
+      }));
+
+      // đồng bộ state cho cropper
+      setImageToCrop(url);
+      setCropOutputWidth(currentWidth);
+      setCropOutputHeight(currentHeight);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+      setCropModalOpen(true); // mở modal crop ngay sau khi chọn ảnh
+    };
+
+    reader.readAsDataURL(file);
+    return false; // không upload thật lên server
+  },
+  showUploadList: false,
+  accept: 'image/*',
+};
+  /* ----------------- CROP LOGO ----------------- */
+
+  const onCropComplete = useCallback((_: Area, croppedAreaPixelsArg: Area) => {
+    setCroppedAreaPixels(croppedAreaPixelsArg);
+  }, []);
+
+async function getCroppedImg(
+  imageSrc: string,
+  pixelCrop: Area,
+  outputWidth?: number,
+  outputHeight?: number
+) {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = document.createElement('img');
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img as HTMLImageElement);
+    img.onerror = (e) => reject(e);
+    img.src = imageSrc;
+  });
+
+  const safeCropWidth = Math.max(1, pixelCrop.width);
+  const safeCropHeight = Math.max(1, pixelCrop.height);
+
+  const destW = Math.max(1, Math.round(outputWidth ?? safeCropWidth));
+  const destH = Math.max(1, Math.round(outputHeight ?? safeCropHeight));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = destW;
+  canvas.height = destH;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Không thể khởi tạo canvas');
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    safeCropWidth,
+    safeCropHeight,
+    0,
+    0,
+    destW,
+    destH
+  );
+
+  return canvas.toDataURL('image/png');
+}
+
+
+
+const handleOpenCropper = () => {
+  const url = settings?.logo?.url || imageToCrop;
+  if (!url) {
+    message.warning('Vui lòng tải logo trước khi chỉnh sửa.');
+    return;
+  }
+
+  const w = settings?.logo?.width ?? cropOutputWidth ?? 120;
+  const h = settings?.logo?.height ?? cropOutputHeight ?? 40;
+
+  setImageToCrop(url);
+  setCropOutputWidth(w);
+  setCropOutputHeight(h);
+  setCrop({ x: 0, y: 0 });
+  setZoom(1);
+  setCroppedAreaPixels(null);
+  setCropModalOpen(true);
+};
+
+const handleSaveCrop = async () => {
+  if (!imageToCrop) {
+    message.error('Không có hình ảnh để cắt.');
+    return;
+  }
+  if (!croppedAreaPixels) {
+    message.warning('Vui lòng chọn vùng cắt trên hình ảnh.');
+    return;
+  }
+
+  try {
+    const targetWidth = Math.max(40, Math.round(cropOutputWidth || 120));
+    const targetHeight = Math.max(20, Math.round(cropOutputHeight || 40));
+
+    const dataUrl = await getCroppedImg(
+      imageToCrop,
+      croppedAreaPixels,
+      targetWidth,
+      targetHeight
+    );
+
+    setSettings((prev: HeaderSettings | null) => ({
+      ...(prev || {}),
+      logo: {
+        ...(prev?.logo || {}),
+        url: dataUrl,
+        width: targetWidth,
+        height: targetHeight,
+      },
+    }));
+
+    setCropModalOpen(false);
+    notifyCustom('success', {
+      title: 'Đã cập nhật logo',
+      description: 'Logo đã được cắt và áp dụng.',
+    });
+  } catch (err) {
+    notifyCustom('error', {
+      title: 'Lỗi cắt logo',
+      description: String(err),
+    });
+  }
+};
 
   /* ----------------- PREVIEW ----------------- */
 
@@ -522,32 +680,115 @@ const HeaderSettingPage: React.FC = () => {
               {previewHeader}
             </Card>
 
-            <Card title="Logo & Màu chữ" size="small">
-              <Space align="start" size={16}>
-                <Upload {...uploadProps}>
-                  <Button icon={<UploadOutlined />}>Tải logo</Button>
-                </Upload>
-                <div>
-                  <Text>Màu chữ</Text>
-                  <Input
-                    type="color"
-                    value={settings.text?.defaultColor || '#ffffff'}
-                    onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        text: {
-                          ...(settings.text || {}),
-                          defaultColor: e.target.value,
-                        },
-                      })
-                    }
-                    style={{ width: 60, display: 'block', marginTop: 4 }}
-                  />
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>🎨</span>
+                  <span>Logo & Màu chữ</span>
+                </div>
+              }
+              size="small"
+            >
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                {/* Logo preview and upload */}
+                <div style={{ 
+                  background: '#fafafa', 
+                  padding: 16, 
+                  borderRadius: 8,
+                  border: '1px dashed #d9d9d9',
+                  textAlign: 'center'
+                }}>
+                  {settings.logo?.url ? (
+                    <div style={{ marginBottom: 12 }}>
+                      <Image
+                        src={settings.logo.url}
+                        alt="Logo preview"
+                        width={settings.logo?.width || 120}
+                        height={settings.logo?.height || 40}
+                        style={{ objectFit: 'contain' }}
+                      />
+                    </div>
+                  ) : (
+                    <div style={{ 
+                      padding: '20px 0', 
+                      color: '#999',
+                      fontSize: 13
+                    }}>
+                      Chưa có logo
+                    </div>
+                  )}
+                  
+                  <Space>
+                    <Upload {...uploadProps}>
+                      <Button icon={<UploadOutlined />} type="primary">
+                        {settings.logo?.url ? 'Đổi logo' : 'Tải logo'}
+                      </Button>
+                    </Upload>
+                    
+                    {settings.logo?.url && (
+                      <Button 
+                        onClick={handleOpenCropper}
+                        icon={<span>✂️</span>}
+                      >
+                        Chỉnh sửa
+                      </Button>
+                    )}
+                  </Space>
+                </div>
+
+                {/* Text color */}
+                <div style={{ 
+                  background: '#fff', 
+                  padding: '12px 16px', 
+                  borderRadius: 6,
+                  border: '1px solid #e8e8e8'
+                }}>
+                  <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 8 }}>
+                    Màu chữ mặc định
+                  </Text>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <Input
+                      type="color"
+                      value={settings.text?.defaultColor || '#ffffff'}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          text: {
+                            ...(settings.text || {}),
+                            defaultColor: e.target.value,
+                          },
+                        })
+                      }
+                      style={{ width: 60, height: 36 }}
+                    />
+                    <Input
+                      value={settings.text?.defaultColor || '#ffffff'}
+                      onChange={(e) =>
+                        setSettings({
+                          ...settings,
+                          text: {
+                            ...(settings.text || {}),
+                            defaultColor: e.target.value,
+                          },
+                        })
+                      }
+                      placeholder="#ffffff"
+                      style={{ flex: 1 }}
+                    />
+                  </div>
                 </div>
               </Space>
             </Card>
 
-            <Card title="Nền header (Đầu trang)" size="small">
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>🌅</span>
+                  <span>Nền header (Đầu trang)</span>
+                </div>
+              }
+              size="small"
+            >
               <Row gutter={[8, 8]}>
                 <Col span={12}>
                   <Text>Loại</Text>
@@ -722,7 +963,15 @@ const HeaderSettingPage: React.FC = () => {
               </Row>
             </Card>
 
-            <Card title="Nền header (Khi cuộn)" size="small">
+            <Card 
+              title={
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 18 }}>🌊</span>
+                  <span>Nền header (Khi cuộn)</span>
+                </div>
+              }
+              size="small"
+            >
               <Row gutter={[8, 8]}>
                 <Col span={12}>
                   <Text>Loại</Text>
@@ -941,6 +1190,158 @@ const HeaderSettingPage: React.FC = () => {
             <Switch />
           </Form.Item>
         </Form>
+      </Modal>
+      {/* Modal chỉnh sửa/crop logo */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <UploadOutlined style={{ fontSize: 18 }} />
+            <span>Chỉnh sửa Logo</span>
+          </div>
+        }
+        open={cropModalOpen}
+        onOk={handleSaveCrop}
+        onCancel={() => setCropModalOpen(false)}
+        okText="Áp dụng"
+        cancelText="Hủy"
+        width={900}
+        centered
+      >
+        <div style={{ padding: '12px 0' }}>
+          {/* Crop area */}
+          <div 
+            style={{ 
+              position: 'relative', 
+              height: 450, 
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: 8,
+              overflow: 'hidden',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+            }} 
+            ref={cropperRef}
+          >
+            {imageToCrop ? (
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={cropAspect}
+                onCropChange={(c: { x: number; y: number }) => setCrop(c)}
+                onZoomChange={(z: number) => setZoom(z)}
+                onCropComplete={onCropComplete}
+              />
+            ) : (
+              <div style={{ 
+                color: '#fff', 
+                padding: 20,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                fontSize: 16
+              }}>
+                Không có hình ảnh để chỉnh sửa
+              </div>
+            )}
+          </div>
+
+          {/* Controls */}
+          <Card 
+            size="small" 
+            style={{ 
+              marginTop: 16,
+              borderRadius: 8,
+              background: '#fafafa'
+            }}
+          >
+            <Row gutter={[16, 16]}>
+              {/* Zoom control */}
+              <Col span={24}>
+                <div>
+                  <Text strong style={{ fontSize: 13, color: '#595959' }}>
+                    🔍 Phóng to / Thu nhỏ
+                  </Text>
+                  <Slider
+                    min={1}
+                    max={3}
+                    step={0.01}
+                    value={zoom}
+                    onChange={(v) => setZoom(Number(v))}
+                    tooltip={{ formatter: (value) => `${Math.round((value ?? 1) * 100)}%` }}
+                    style={{ marginTop: 8 }}
+                  />
+                </div>
+              </Col>
+
+              <Col span={24}>
+                <Divider style={{ margin: '8px 0' }} />
+              </Col>
+
+              {/* Dimensions */}
+              <Col span={24}>
+                <Text strong style={{ fontSize: 13, color: '#595959', display: 'block', marginBottom: 12 }}>
+                  📐 Kích thước đầu ra
+                </Text>
+                <Row gutter={12}>
+                  <Col span={12}>
+                    <div style={{ 
+                      background: '#fff', 
+                      padding: '12px 16px', 
+                      borderRadius: 6,
+                      border: '1px solid #e8e8e8'
+                    }}>
+                      <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
+                        Chiều rộng (px)
+                      </Text>
+                      <InputNumber
+                        min={40}
+                        max={800}
+                        value={cropOutputWidth}
+                        onChange={(v) => setCropOutputWidth(Number(v || 120))}
+                        style={{ width: '100%' }}
+                        size="large"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div style={{ 
+                      background: '#fff', 
+                      padding: '12px 16px', 
+                      borderRadius: 6,
+                      border: '1px solid #e8e8e8'
+                    }}>
+                      <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 6 }}>
+                        Chiều cao (px)
+                      </Text>
+                      <InputNumber
+                        min={20}
+                        max={600}
+                        value={cropOutputHeight}
+                        onChange={(v) => setCropOutputHeight(Number(v || 40))}
+                        style={{ width: '100%' }}
+                        size="large"
+                      />
+                    </div>
+                  </Col>
+                </Row>
+              </Col>
+
+              {/* Info hint */}
+              <Col span={24}>
+                <div style={{ 
+                  background: '#e6f7ff', 
+                  padding: '8px 12px', 
+                  borderRadius: 6,
+                  border: '1px solid #91d5ff',
+                  fontSize: 12,
+                  color: '#096dd9'
+                }}>
+                  💡 <strong>Mẹo:</strong> Kéo để di chuyển, cuộn chuột để phóng to/thu nhỏ. Điều chỉnh kích thước để logo vừa với header.
+                </div>
+              </Col>
+            </Row>
+          </Card>
+        </div>
       </Modal>
     </div>
   );

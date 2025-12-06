@@ -2,9 +2,12 @@ import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
 
+// By default we don't force `output: 'export'` because that disables
+// Next.js API Routes. Set the env var `NEXT_STATIC_EXPORT=true` when
+// you intentionally want a static HTML export (for GitHub Pages, etc.).
 const nextConfig = {
-  // Static export for GitHub Pages
-  output: 'export',
+  // Static export can break API routes — enable only when explicitly requested
+  output: process.env.NEXT_STATIC_EXPORT === 'true' ? 'export' : undefined,
   reactStrictMode: true,
   images: {
     unoptimized: true, // Keep if deploying to static hosting

@@ -488,6 +488,10 @@ const HeaderSettingPage: React.FC = () => {
         try {
           localStorage.setItem("header_settings_updated", String(Date.now()));
           window.dispatchEvent(new Event("header_settings_updated"));
+
+          const channel = new BroadcastChannel('app_settings_channel');
+          channel.postMessage('header-updated');
+          channel.close();
         } catch {
           // ignore
         }

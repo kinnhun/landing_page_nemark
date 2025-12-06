@@ -10,7 +10,13 @@ interface ApiResponse<T> {
 
 export async function getHeaderSettings(): Promise<HeaderSettings | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/settings/header`);
+    const res = await fetch(`${API_BASE_URL}/api/settings/header`, {
+      cache: 'no-store',
+      headers: {
+        'Pragma': 'no-cache',
+        'Cache-Control': 'no-cache'
+      }
+    });
     if (!res.ok) return null;
     const json = (await res.json()) as ApiResponse<HeaderSettings>;
     return json.data;

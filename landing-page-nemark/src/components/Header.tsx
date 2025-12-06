@@ -60,11 +60,20 @@ const Header: React.FC = () => {
     window.addEventListener('storage', onStorage);
     window.addEventListener('header_settings_updated', onCustom);
 
+    // BroadcastChannel
+    const channel = new BroadcastChannel('app_settings_channel');
+    channel.onmessage = (event) => {
+      if (event.data === 'header-updated') {
+        fetchSettings();
+      }
+    };
+
     return () => {
       clearTimeout(t);
       clearInterval(id);
       window.removeEventListener('storage', onStorage);
       window.removeEventListener('header_settings_updated', onCustom);
+      channel.close();
     };
   }, [fetchSettings]);
 

@@ -72,6 +72,71 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get banner settings
+   */
+  async getBannerSettings() {
+    try {
+      const settings = await settingsModel.getBannerSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting banner settings:', err);
+      throw new InternalError('Failed to retrieve banner settings');
+    }
+  }
+
+  /**
+   * Update banner settings
+   */
+  async updateBannerSettings(data) {
+    try {
+      // Validate data
+      this.validateBannerSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateBannerSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating banner settings:', err);
+      throw new InternalError('Failed to update banner settings');
+    }
+  }
+
+  /**
+   * Reset banner settings to default
+   */
+  async resetBannerSettings() {
+    try {
+      const reset = await settingsModel.resetBannerSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting banner settings:', err);
+      throw new InternalError('Failed to reset banner settings');
+    }
+  }
+
+  /**
+   * Validate banner settings data
+   */
+  validateBannerSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    if (data.title && typeof data.title !== 'string') {
+      throw new ValidationError('Invalid title');
+    }
+
+    if (data.description && typeof data.description !== 'string') {
+      throw new ValidationError('Invalid description');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

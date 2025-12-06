@@ -44,6 +44,10 @@ class App {
 
     // API routes
     this.app.use(config.api.prefix, routes);
+
+    // Serve static files
+    const path = require('path');
+    this.app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
   }
 
   setupErrorHandling() {

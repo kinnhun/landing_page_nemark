@@ -320,6 +320,90 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/pricing
+   * @desc    Get pricing settings
+   * @access  Public
+   */
+  async getPricingSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getPricingSettings();
+      return response.success(res, settings, 'Pricing settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/pricing
+   * @desc    Update pricing settings
+   * @access  Public (should be protected in production)
+   */
+  async updatePricingSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updatePricingSettings(req.body);
+      return response.success(res, settings, 'Pricing settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/pricing/reset
+   * @desc    Reset pricing settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetPricingSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetPricingSettings();
+      return response.success(res, settings, 'Pricing settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   GET /api/settings/team
+   * @desc    Get team settings
+   * @access  Public
+   */
+  async getTeamSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getTeamSettings();
+      return response.success(res, settings, 'Team settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/team
+   * @desc    Update team settings
+   * @access  Public (should be protected in production)
+   */
+  async updateTeamSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updateTeamSettings(req.body);
+      return response.success(res, settings, 'Team settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/team/reset
+   * @desc    Reset team settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetTeamSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetTeamSettings();
+      return response.success(res, settings, 'Team settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

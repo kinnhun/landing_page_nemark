@@ -465,6 +465,177 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get pricing settings
+   */
+  async getPricingSettings() {
+    try {
+      const settings = await settingsModel.getPricingSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting pricing settings:', err);
+      throw new InternalError('Failed to retrieve pricing settings');
+    }
+  }
+
+  /**
+   * Update pricing settings
+   */
+  async updatePricingSettings(data) {
+    try {
+      // Validate data
+      this.validatePricingSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updatePricingSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating pricing settings:', err);
+      throw new InternalError('Failed to update pricing settings');
+    }
+  }
+
+  /**
+   * Reset pricing settings to default
+   */
+  async resetPricingSettings() {
+    try {
+      const reset = await settingsModel.resetPricingSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting pricing settings:', err);
+      throw new InternalError('Failed to reset pricing settings');
+    }
+  }
+
+  /**
+   * Validate pricing settings data
+   */
+  validatePricingSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    // Validate title
+    if (data.title && typeof data.title !== 'string') {
+      throw new ValidationError('Title must be a string');
+    }
+
+    // Validate packages
+    if (data.packages && !Array.isArray(data.packages)) {
+      throw new ValidationError('Packages must be an array');
+    }
+
+    if (data.packages && data.packages.length > 0) {
+      data.packages.forEach((pkg, index) => {
+        if (!pkg.id || !pkg.title || typeof pkg.price !== 'number') {
+          throw new ValidationError(`Invalid package at index ${index}: must have id, title, and price`);
+        }
+        if (!pkg.features || !Array.isArray(pkg.features)) {
+          throw new ValidationError(`Invalid package at index ${index}: features must be an array`);
+        }
+        pkg.features.forEach((feature, fIndex) => {
+          if (!feature.text || typeof feature.included !== 'boolean') {
+            throw new ValidationError(`Invalid feature at package ${index}, feature ${fIndex}: must have text and included`);
+          }
+        });
+      });
+    }
+
+    // Validate columns
+    if (data.columns !== undefined && (typeof data.columns !== 'number' || data.columns < 1 || data.columns > 4)) {
+      throw new ValidationError('Columns must be a number between 1 and 4');
+    }
+
+    return true;
+  }
+
+  /**
+   * Get team settings
+   */
+  async getTeamSettings() {
+    try {
+      const settings = await settingsModel.getTeamSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting team settings:', err);
+      throw new InternalError('Failed to get team settings');
+    }
+  }
+
+  /**
+   * Update team settings
+   */
+  async updateTeamSettings(data) {
+    try {
+      // Validate data
+      this.validateTeamSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateTeamSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating team settings:', err);
+      throw new InternalError('Failed to update team settings');
+    }
+  }
+
+  /**
+   * Reset team settings to default
+   */
+  async resetTeamSettings() {
+    try {
+      const reset = await settingsModel.resetTeamSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting team settings:', err);
+      throw new InternalError('Failed to reset team settings');
+    }
+  }
+
+  /**
+   * Validate team settings data
+   */
+  validateTeamSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+
+    // Validate title
+    if (data.title && typeof data.title !== 'string') {
+      throw new ValidationError('Title must be a string');
+    }
+
+    // Validate members
+    if (data.members && !Array.isArray(data.members)) {
+      throw new ValidationError('Members must be an array');
+    }
+
+    if (data.members && data.members.length > 0) {
+      data.members.forEach((member, index) => {
+        if (!member.id || !member.name || !member.position || !member.bio) {
+          throw new ValidationError(`Invalid member at index ${index}: must have id, name, position, and bio`);
+        }
+        if (!member.avatar || typeof member.avatar !== 'string') {
+          throw new ValidationError(`Invalid member at index ${index}: avatar must be a string`);
+        }
+      });
+    }
+
+    // Validate columns (1-2 for team)
+    if (data.columns !== undefined && (typeof data.columns !== 'number' || data.columns < 1 || data.columns > 2)) {
+      throw new ValidationError('Columns must be a number between 1 and 2');
+    }
+
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

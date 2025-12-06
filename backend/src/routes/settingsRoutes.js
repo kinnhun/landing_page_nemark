@@ -38,6 +38,16 @@ router.get('/portfolio', settingsController.getPortfolioSettings);
 router.post('/portfolio', settingsController.updatePortfolioSettings);
 router.post('/portfolio/reset', settingsController.resetPortfolioSettings);
 
+// Pricing settings routes
+router.get('/pricing', settingsController.getPricingSettings);
+router.post('/pricing', settingsController.updatePricingSettings);
+router.post('/pricing/reset', settingsController.resetPricingSettings);
+
+// Team settings routes
+router.get('/team', settingsController.getTeamSettings);
+router.post('/team', settingsController.updateTeamSettings);
+router.post('/team/reset', settingsController.resetTeamSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

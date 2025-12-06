@@ -12,6 +12,8 @@ class SettingsModel {
     this.servicesFileName = 'services-settings.json';
     this.ctaFileName = 'cta-settings.json';
     this.portfolioFileName = 'portfolio-settings.json';
+    this.pricingFileName = 'pricing-settings.json';
+    this.teamFileName = 'team-settings.json';
     
     this.defaultHeaderSettings = {
       menu: {
@@ -206,6 +208,149 @@ class SettingsModel {
       visible: true,
       columns: 3,
       showFilter: true,
+      enableAnimation: true
+    };
+
+    this.defaultPricingSettings = {
+      title: 'Bảng Giá Dịch Vụ',
+      description: 'Nemark cung cấp các gói dịch vụ linh hoạt phù hợp với mọi nhu cầu — từ khởi tạo website cơ bản đến giải pháp doanh nghiệp chuyên sâu.',
+      packages: [
+        {
+          id: 1,
+          title: 'Gói Cơ Bản',
+          description: 'Phù hợp cá nhân hoặc cửa hàng nhỏ muốn có website giới thiệu nhanh chóng, chi phí tiết kiệm.',
+          price: 0,
+          priceUnit: '/ tháng',
+          currency: '₫',
+          buttonText: 'Dùng Thử Miễn Phí',
+          buttonLink: '#contact',
+          buttonSubtext: 'Không yêu cầu thẻ thanh toán',
+          features: [
+            { id: 1, text: 'Website giao diện sẵn', included: true },
+            { id: 2, text: 'Tối ưu chuẩn SEO cơ bản', included: true },
+            { id: 3, text: 'Hosting miễn phí 1GB', included: true },
+            { id: 4, text: 'Tùy chỉnh giao diện nâng cao', included: false },
+            { id: 5, text: 'Tích hợp AI automation', included: false },
+            { id: 6, text: 'Hỗ trợ kỹ thuật 24/7', included: false },
+            { id: 7, text: 'Quản trị nội dung định kỳ', included: false }
+          ],
+          popular: false,
+          enabled: true
+        },
+        {
+          id: 2,
+          title: 'Gói Doanh Nghiệp',
+          description: 'Dành cho doanh nghiệp muốn website chuyên nghiệp, đầy đủ tính năng, tối ưu bán hàng & thương hiệu.',
+          price: 2900000,
+          priceUnit: '/ tháng',
+          currency: '₫',
+          buttonText: 'Đăng Ký Ngay',
+          buttonLink: '#contact',
+          buttonSubtext: 'Miễn phí tư vấn & demo',
+          features: [
+            { id: 1, text: 'Thiết kế giao diện theo thương hiệu', included: true },
+            { id: 2, text: 'Tối ưu SEO nâng cao', included: true },
+            { id: 3, text: 'Hosting doanh nghiệp 10GB', included: true },
+            { id: 4, text: 'Tích hợp thanh toán & vận chuyển', included: true },
+            { id: 5, text: 'Tích hợp AI chatbot trả lời tự động', included: true },
+            { id: 6, text: 'Hỗ trợ kỹ thuật 24/7', included: true },
+            { id: 7, text: 'Phát triển phần mềm theo yêu cầu', included: false }
+          ],
+          popular: true,
+          enabled: true,
+          borderColor: '#2563eb',
+          scale: 1.05
+        },
+        {
+          id: 3,
+          title: 'Gói Chuyên Sâu',
+          description: 'Gói giải pháp toàn diện bao gồm website + phần mềm + AI + hệ thống vận hành riêng cho doanh nghiệp.',
+          price: 4900000,
+          priceUnit: '/ tháng',
+          currency: '₫',
+          buttonText: 'Nhận Tư Vấn',
+          buttonLink: '#contact',
+          buttonSubtext: 'Cam kết hiệu quả & bảo trì dài hạn',
+          features: [
+            { id: 1, text: 'Thiết kế website cao cấp theo yêu cầu', included: true },
+            { id: 2, text: 'Xây dựng phần mềm/CRM theo quy trình của bạn', included: true },
+            { id: 3, text: 'Tối ưu SEO tổng thể + content chuẩn SEO', included: true },
+            { id: 4, text: 'Tích hợp AI automation & phân tích dữ liệu', included: true },
+            { id: 5, text: 'Hosting/VPS riêng – bảo mật cao', included: true },
+            { id: 6, text: 'Quản trị website hằng tháng', included: true },
+            { id: 7, text: 'Hỗ trợ kỹ thuật ưu tiên 24/7', included: true }
+          ],
+          popular: false,
+          enabled: true
+        }
+      ],
+      visible: true,
+      columns: 3
+    };
+
+    this.defaultTeamSettings = {
+      title: 'Đội Ngũ Nemark',
+      description: 'Những chuyên gia giàu kinh nghiệm trong lĩnh vực thiết kế website, phần mềm, AI automation và giải pháp số, luôn sẵn sàng đồng hành cùng doanh nghiệp.',
+      members: [
+        {
+          id: 1,
+          name: 'Nguyễn Minh Khôi',
+          position: 'Giám Đốc Điều Hành',
+          bio: 'Người sáng lập Nemark với tầm nhìn xây dựng hệ sinh thái giải pháp số giúp doanh nghiệp phát triển bền vững trong thời đại công nghệ.',
+          avatar: '/assets/img/team/team-1.jpg',
+          social: {
+            twitter: '#',
+            facebook: '#',
+            instagram: '#',
+            linkedin: '#'
+          },
+          enabled: true
+        },
+        {
+          id: 2,
+          name: 'Trần Thu Hà',
+          position: 'Quản Lý Sản Phẩm',
+          bio: 'Chịu trách nhiệm xây dựng và hoạch định sản phẩm website – phần mềm, đảm bảo trải nghiệm người dùng mượt mà và hiệu quả.',
+          avatar: '/assets/img/team/team-2.jpg',
+          social: {
+            twitter: '#',
+            facebook: '#',
+            instagram: '#',
+            linkedin: '#'
+          },
+          enabled: true
+        },
+        {
+          id: 3,
+          name: 'Phạm Hoàng Long',
+          position: 'Giám Đốc Công Nghệ',
+          bio: 'Chuyên gia giải pháp AI, tự động hóa và hệ thống phần mềm với hơn 10 năm kinh nghiệm phát triển các nền tảng công nghệ phức tạp.',
+          avatar: '/assets/img/team/team-3.jpg',
+          social: {
+            twitter: '#',
+            facebook: '#',
+            instagram: '#',
+            linkedin: '#'
+          },
+          enabled: true
+        },
+        {
+          id: 4,
+          name: 'Lê Mai Anh',
+          position: 'Trưởng Phòng Vận Hành',
+          bio: 'Đảm bảo quy trình làm việc hiệu quả, quản lý dự án và chăm sóc khách hàng giúp Nemark duy trì chất lượng dịch vụ cao nhất.',
+          avatar: '/assets/img/team/team-4.jpg',
+          social: {
+            twitter: '#',
+            facebook: '#',
+            instagram: '#',
+            linkedin: '#'
+          },
+          enabled: true
+        }
+      ],
+      visible: true,
+      columns: 2,
       enableAnimation: true
     };
   }
@@ -444,6 +589,71 @@ class SettingsModel {
    */
   async resetPortfolioSettings() {
     return await storage.write(this.portfolioFileName, this.defaultPortfolioSettings);
+  }
+
+  /**
+   * Get pricing settings
+   */
+  async getPricingSettings() {
+    const settings = await storage.read(this.pricingFileName);
+    if (!settings) return this.defaultPricingSettings;
+    
+    return {
+      ...this.defaultPricingSettings,
+      ...settings,
+      packages: settings.packages || this.defaultPricingSettings.packages
+    };
+  }
+
+  /**
+   * Update pricing settings
+   */
+  async updatePricingSettings(data) {
+    const toSave = {
+      ...data,
+      lastUpdated: Date.now()
+    };
+    return await storage.write(this.pricingFileName, toSave);
+  }
+
+  /**
+   * Reset pricing settings
+   */
+  async resetPricingSettings() {
+    return await storage.write(this.pricingFileName, this.defaultPricingSettings);
+  }
+
+  /**
+   * Get team settings
+   */
+  async getTeamSettings() {
+    const settings = await storage.read(this.teamFileName);
+    if (!settings) return this.defaultTeamSettings;
+    
+    // Merge with defaults to ensure all fields exist
+    return {
+      ...this.defaultTeamSettings,
+      ...settings,
+      members: settings.members || this.defaultTeamSettings.members
+    };
+  }
+
+  /**
+   * Update team settings
+   */
+  async updateTeamSettings(data) {
+    const toSave = {
+      ...data,
+      lastUpdated: Date.now()
+    };
+    return await storage.write(this.teamFileName, toSave);
+  }
+
+  /**
+   * Reset team settings
+   */
+  async resetTeamSettings() {
+    return await storage.write(this.teamFileName, this.defaultTeamSettings);
   }
 }
 

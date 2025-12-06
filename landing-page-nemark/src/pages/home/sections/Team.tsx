@@ -1,122 +1,188 @@
-import React from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image';
-import team1 from '../../../../public/assets/img/team/team-1.jpg';
-import team2 from '../../../../public/assets/img/team/team-2.jpg';
-import team3 from '../../../../public/assets/img/team/team-3.jpg';
-import team4 from '../../../../public/assets/img/team/team-4.jpg';
 import { TwitterOutlined, FacebookOutlined, InstagramOutlined, LinkedinOutlined } from '@ant-design/icons';
 import { Reveal, StaggerContainer, StaggerItem } from '@/components/Reveal';
+import { getTeamSettings } from '@/services/teamApi';
+import type { TeamSettings, TeamMember } from '@/types/team';
 
 const Team = () => {
+  const [settings, setSettings] = useState<TeamSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTeamData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await getTeamSettings();
+      setSettings(data);
+    } catch (err) {
+      console.error('Error fetching team settings:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTeamData();
+
+    // Listen for team settings updates
+    const handleUpdate = () => {
+      fetchTeamData();
+    };
+
+    // Listen to localStorage event
+    window.addEventListener('team_settings_updated', handleUpdate);
+
+    // Listen to BroadcastChannel
+    const channel = new BroadcastChannel('app_settings_channel');
+    channel.addEventListener('message', (event) => {
+      if (event.data === 'team-updated') {
+        fetchTeamData();
+      }
+    });
+
+    return () => {
+      window.removeEventListener('team_settings_updated', handleUpdate);
+      channel.close();
+    };
+  }, [fetchTeamData]);
+
+  // Don't render if hidden or loading
+  if (loading) {
+    return (
+      <section id="team" className="py-16 bg-white scroll-mt-20">
+        <div className="container mx-auto px-4 text-center">
+          <div className="text-gray-500">Đang tải...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!settings || settings.visible === false) {
+    return null;
+  }
+
+  const members = (settings.members || []).filter(member => member.enabled !== false);
+
+  // Get grid columns class
+  const getGridCols = () => {
+    const cols = settings.columns || 2;
+    if (cols === 1) return 'grid-cols-1';
+    return 'grid-cols-1 lg:grid-cols-2'; // default 2
+  };
+
+  // Handle image source - can be string URL or imported image
+  const getImageSrc = (avatar: string): string => {
+    if (typeof avatar === 'string') {
+      return avatar;
+    }
+    if (typeof avatar === 'object' && avatar !== null && 'src' in avatar) {
+      return (avatar as { src: string }).src;
+    }
+    return '';
+  };
+
   return (
     <section id="team" className="py-16 bg-white scroll-mt-20">
 
       <div className="container mx-auto px-4 text-center mb-12 flex flex-col items-center">
         <Reveal direction="up">
-          <h2 className="text-3xl font-bold mb-4 uppercase text-gray-800">Đội Ngũ Nemark</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Những chuyên gia giàu kinh nghiệm trong lĩnh vực thiết kế website, phần mềm, 
-            AI automation và giải pháp số, luôn sẵn sàng đồng hành cùng doanh nghiệp.
-          </p>
+          <h2 className="text-3xl font-bold mb-4 uppercase text-gray-800">{settings.title || 'Đội Ngũ Nemark'}</h2>
+          {settings.description && (
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              {settings.description}
+            </p>
+          )}
         </Reveal>
       </div>
 
       <div className="container mx-auto px-4">
-        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-          {/* CEO */}
-          <StaggerItem>
-            <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-                <Image src={team1} alt="" fill className="object-cover" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">Nguyễn Minh Khôi</h4>
-                <span className="text-sm text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-medium block mb-3">Giám Đốc Điều Hành</span>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  Người sáng lập Nemark với tầm nhìn xây dựng hệ sinh thái giải pháp số 
-                  giúp doanh nghiệp phát triển bền vững trong thời đại công nghệ.
-                </p>
-                <div className="flex gap-3">
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><TwitterOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><FacebookOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><InstagramOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><LinkedinOutlined className="text-lg" /></a>
-                </div>
-              </div>
-            </div>
-          </StaggerItem>
-
-          {/* Product Manager */}
-          <StaggerItem>
-            <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-                <Image src={team2} alt="" fill className="object-cover" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">Trần Thu Hà</h4>
-                <span className="text-sm text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-medium block mb-3">Quản Lý Sản Phẩm</span>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  Chịu trách nhiệm xây dựng và hoạch định sản phẩm website – phần mềm, 
-                  đảm bảo trải nghiệm người dùng mượt mà và hiệu quả.
-                </p>
-                <div className="flex gap-3">
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><TwitterOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><FacebookOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><InstagramOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><LinkedinOutlined className="text-lg" /></a>
-                </div>
-              </div>
-            </div>
-          </StaggerItem>
-
-          {/* CTO */}
-          <StaggerItem>
-            <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-                <Image src={team3} alt="" fill className="object-cover" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">Phạm Hoàng Long</h4>
-                <span className="text-sm text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-medium block mb-3">Giám Đốc Công Nghệ</span>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  Chuyên gia giải pháp AI, tự động hóa và hệ thống phần mềm với hơn 10 năm 
-                  kinh nghiệm phát triển các nền tảng công nghệ phức tạp.
-                </p>
-                <div className="flex gap-3">
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><TwitterOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><FacebookOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><InstagramOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><LinkedinOutlined className="text-lg" /></a>
-                </div>
-              </div>
-            </div>
-          </StaggerItem>
-
-          {/* Kế toán / Vận hành */}
-          <StaggerItem>
-            <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300">
-              <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
-                <Image src={team4} alt="" fill className="object-cover" />
-              </div>
-              <div className="flex-1">
-                <h4 className="text-xl font-bold text-gray-800 mb-1">Lê Mai Anh</h4>
-                <span className="text-sm text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-medium block mb-3">Trưởng Phòng Vận Hành</span>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">
-                  Đảm bảo quy trình làm việc hiệu quả, quản lý dự án và chăm sóc khách hàng 
-                  giúp Nemark duy trì chất lượng dịch vụ cao nhất.
-                </p>
-                <div className="flex gap-3">
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><TwitterOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><FacebookOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><InstagramOutlined className="text-lg" /></a>
-                  <a href="#" className="text-gray-400 hover:text-blue-500 transition-colors"><LinkedinOutlined className="text-lg" /></a>
-                </div>
-              </div>
-            </div>
-          </StaggerItem>
-
-        </StaggerContainer>
+        {members.length > 0 ? (
+          <StaggerContainer className={`grid ${getGridCols()} gap-8 items-stretch`}>
+            {members.map((member: TeamMember) => {
+              const imageSrc = getImageSrc(member.avatar);
+              const social = member.social || {};
+              
+              return (
+                <StaggerItem key={member.id} className="h-full">
+                  <div className="bg-white shadow-sm rounded-lg p-6 flex flex-col sm:flex-row items-start gap-6 border border-gray-100 hover:shadow-md transition-shadow duration-300 h-full">
+                    <div className="w-32 h-32 relative shrink-0 rounded-full overflow-hidden border-4 border-white shadow-md">
+                      {imageSrc ? (
+                        <Image 
+                          src={imageSrc} 
+                          alt={member.name} 
+                          fill 
+                          className="object-cover" 
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col">
+                      <h4 className="text-xl font-bold text-gray-800 mb-1">{member.name}</h4>
+                      <span 
+                        className="text-sm text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-teal-500 font-medium block mb-3"
+                        style={member.positionColor ? { color: member.positionColor } : {}}
+                      >
+                        {member.position}
+                      </span>
+                      <p className="text-sm text-gray-600 mb-4 leading-relaxed flex-1">
+                        {member.bio}
+                      </p>
+                      <div className="flex gap-3">
+                        {social.twitter && (
+                          <a 
+                            href={social.twitter} 
+                            target={social.twitter.startsWith('#') ? undefined : '_blank'}
+                            rel={social.twitter.startsWith('#') ? undefined : 'noopener noreferrer'}
+                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                          >
+                            <TwitterOutlined className="text-lg" />
+                          </a>
+                        )}
+                        {social.facebook && (
+                          <a 
+                            href={social.facebook} 
+                            target={social.facebook.startsWith('#') ? undefined : '_blank'}
+                            rel={social.facebook.startsWith('#') ? undefined : 'noopener noreferrer'}
+                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                          >
+                            <FacebookOutlined className="text-lg" />
+                          </a>
+                        )}
+                        {social.instagram && (
+                          <a 
+                            href={social.instagram} 
+                            target={social.instagram.startsWith('#') ? undefined : '_blank'}
+                            rel={social.instagram.startsWith('#') ? undefined : 'noopener noreferrer'}
+                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                          >
+                            <InstagramOutlined className="text-lg" />
+                          </a>
+                        )}
+                        {social.linkedin && (
+                          <a 
+                            href={social.linkedin} 
+                            target={social.linkedin.startsWith('#') ? undefined : '_blank'}
+                            rel={social.linkedin.startsWith('#') ? undefined : 'noopener noreferrer'}
+                            className="text-gray-400 hover:text-blue-500 transition-colors"
+                          >
+                            <LinkedinOutlined className="text-lg" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </StaggerItem>
+              );
+            })}
+          </StaggerContainer>
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            Chưa có thành viên nào để hiển thị
+          </div>
+        )}
       </div>
 
     </section>

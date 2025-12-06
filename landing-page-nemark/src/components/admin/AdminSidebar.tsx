@@ -72,6 +72,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           label: 'Cài Đặt Portfolio',
         },
         {
+          key: '/admin/settings-landing-page/pricing',
+          icon: <AppstoreOutlined />,
+          label: 'Cài Đặt Pricing',
+        },
+        {
           key: '/admin/settings-landing-page/team',
           icon: <UserOutlined />,
           label: 'Cài Đặt Team',

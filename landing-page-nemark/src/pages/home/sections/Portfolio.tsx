@@ -11,6 +11,7 @@ const Portfolio = () => {
   const [previewImage, setPreviewImage] = useState('');
   const [settings, setSettings] = useState<PortfolioSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [displayedRows, setDisplayedRows] = useState(3); // Số dòng hiển thị ban đầu
 
   const fetchPortfolioData = useCallback(async () => {
     try {
@@ -49,6 +50,11 @@ const Portfolio = () => {
     };
   }, [fetchPortfolioData]);
 
+  // Reset displayed rows when filter changes
+  useEffect(() => {
+    setDisplayedRows(3);
+  }, [filter]);
+
   // Don't render if hidden or loading
   if (loading) {
     return (
@@ -75,12 +81,55 @@ const Portfolio = () => {
   const items = (settings.items || []).filter(item => item.enabled !== false);
   const filteredItems = filter === '*' ? items : items.filter(item => item.category === filter);
 
+  // Get number of columns from settings
+  const columns = settings.columns || 3;
+  
+  // Calculate items per row based on columns
+  // For responsive: on mobile always 1, on tablet/mobile use responsive cols
+  const getItemsPerRow = () => {
+    // This will be used to calculate how many items = 1 row
+    // On desktop: use columns setting
+    // On mobile/tablet: responsive grid handles it
+    return columns;
+  };
+
+  const itemsPerRow = getItemsPerRow();
+  const itemsPerPage = displayedRows * itemsPerRow; // Số items = số dòng * số cột
+
+  // Items to display (limited by rows)
+  const itemsToDisplay = filteredItems.slice(0, itemsPerPage);
+  const hasMore = itemsPerPage < filteredItems.length;
+
+  // Calculate remaining rows
+  const remainingItems = Math.max(0, filteredItems.length - itemsPerPage);
+  const remainingRows = remainingItems > 0 ? Math.ceil(remainingItems / itemsPerRow) : 0;
+
+  // Handle load more - add 3 more rows
+  const handleLoadMore = () => {
+    setDisplayedRows(prev => {
+      const newRows = prev + 3;
+      // Ensure we don't exceed total items
+      const maxRows = Math.ceil(filteredItems.length / itemsPerRow);
+      return Math.min(newRows, maxRows);
+    });
+  };
+
+  // Debug log (remove in production)
+  // console.log('Portfolio Debug:', {
+  //   columns,
+  //   itemsPerRow,
+  //   displayedRows,
+  //   itemsPerPage,
+  //   filteredItemsLength: filteredItems.length,
+  //   itemsToDisplayLength: itemsToDisplay.length,
+  //   hasMore
+  // });
+
   // Get grid columns class
   const getGridCols = () => {
-    const cols = settings.columns || 3;
-    if (cols === 1) return 'grid-cols-1';
-    if (cols === 2) return 'grid-cols-1 md:grid-cols-2';
-    if (cols === 4) return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
+    if (columns === 1) return 'grid-cols-1';
+    if (columns === 2) return 'grid-cols-1 md:grid-cols-2';
+    if (columns === 4) return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'; // default 3
   };
 
@@ -123,8 +172,9 @@ const Portfolio = () => {
 
         {/* DANH SÁCH DỰ ÁN */}
         {filteredItems.length > 0 ? (
-          <StaggerContainer key={filter} className={`grid ${getGridCols()} gap-8`}>
-            {filteredItems.map(item => {
+          <>
+            <StaggerContainer key={`${filter}-${itemsPerPage}`} className={`grid ${getGridCols()} gap-8`}>
+              {itemsToDisplay.map(item => {
               // Handle image source - can be string URL or imported image
               const imageSrc = typeof item.img === 'string' 
                 ? item.img 
@@ -181,8 +231,21 @@ const Portfolio = () => {
                   </div>
                 </StaggerItem>
               );
-            })}
-          </StaggerContainer>
+              })}
+            </StaggerContainer>
+
+            {/* NÚT XEM THÊM */}
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  className="px-8 py-3 bg-linear-to-r from-blue-600 to-teal-500 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  Xem Thêm {remainingRows} Dòng ({remainingItems} dự án)
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-12 text-gray-500">
             Chưa có dự án nào để hiển thị

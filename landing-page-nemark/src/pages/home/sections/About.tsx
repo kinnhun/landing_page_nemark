@@ -1,12 +1,53 @@
-import React, { useState } from 'react'
-import Image from 'next/image';
-import aboutImg from '../../../../public/assets/img/about.jpg';
-import { DeploymentUnitOutlined, CodeOutlined, CloudServerOutlined } from '@ant-design/icons';
+import React, { useState, useEffect } from 'react'
+import * as Icons from '@ant-design/icons';
 import { Modal } from 'antd';
 import { Reveal } from '@/components/Reveal';
+import { getAboutSettings } from '../../../services/aboutApi';
+import type { AboutSettings } from '../../../types/about';
 
 const About = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [settings, setSettings] = useState<AboutSettings | null>(null);
+
+  useEffect(() => {
+    getAboutSettings().then(data => {
+      if (data) setSettings(data);
+    });
+
+    // Listen for updates
+    const handler = (e: Event) => {
+      try {
+        const ce = e as CustomEvent<AboutSettings>;
+        if (ce?.detail) setSettings(ce.detail);
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('aboutSettingsUpdated', handler as EventListener);
+
+    const channel = new BroadcastChannel('app_settings_channel');
+    channel.onmessage = (event) => {
+      if (event.data === 'about-updated') {
+        getAboutSettings().then(data => {
+          if (data) setSettings(data);
+        });
+      }
+    };
+
+    return () => {
+      window.removeEventListener('aboutSettingsUpdated', handler as EventListener);
+      channel.close();
+    };
+  }, []);
+
+  if (!settings) return null;
+
+  // Helper to render icon dynamically
+  const renderIcon = (iconName: string) => {
+    const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[iconName];
+    return IconComponent ? <IconComponent className="text-3xl text-blue-500 group-hover:text-white transition-colors duration-300" /> : null;
+  };
 
   return (
     <section id="about" className="py-16 bg-white text-gray-600 scroll-mt-20">
@@ -17,7 +58,11 @@ const About = () => {
           <div className="lg:w-1/2 relative flex items-center lg:order-last">
             <Reveal direction="left" width="100%">
               <div className="relative">
-                <Image src={aboutImg} className="w-full h-auto block rounded shadow-lg" alt="Nemark About" />
+                <img 
+                  src={settings.image} 
+                  className="w-full h-auto block rounded shadow-lg" 
+                  alt="About Image" 
+                />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                     <a 
@@ -35,53 +80,27 @@ const About = () => {
           {/* Nội dung giới thiệu */}
           <div className="lg:w-1/2">
             <Reveal direction="right">
-              <h3 className="text-3xl font-bold mb-4 text-gray-800">Giới Thiệu Về Nemark</h3>
+              <h3 className="text-3xl font-bold mb-4 text-gray-800">{settings.title}</h3>
               <p className="mb-6 text-lg leading-relaxed">
-                Nemark là đơn vị cung cấp giải pháp số toàn diện cho doanh nghiệp, 
-                bao gồm: thiết kế website, phát triển phần mềm theo yêu cầu, AI automation 
-                và hệ thống hosting/vps chuyên nghiệp. Chúng tôi mang đến những sản phẩm 
-                hiện đại, tối ưu trải nghiệm người dùng và hỗ trợ doanh nghiệp chuyển đổi số hiệu quả.
+                {settings.description}
               </p>
 
               <ul className="list-none p-0 m-0">
-                <li className="flex items-start mt-8 group">
-                  <div className="p-3 rounded-full bg-blue-50 mr-5 group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">
-                    <DeploymentUnitOutlined className="text-3xl text-blue-500 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                  <div>
-                    <h5 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors duration-300">Thiết Kế Website & Giải Pháp Thương Hiệu</h5>
-                    <p className="text-sm">
-                      Website chuẩn SEO, giao diện hiện đại, tốc độ cao và tối ưu chuyển đổi — 
-                      phù hợp mọi ngành nghề và mô hình kinh doanh.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex items-start mt-8 group">
-                  <div className="p-3 rounded-full bg-blue-50 mr-5 group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">
-                    <CodeOutlined className="text-3xl text-blue-500 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                  <div>
-                    <h5 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors duration-300">Phần Mềm, Ứng Dụng & Tự Động Hóa</h5>
-                    <p className="text-sm">
-                      Phát triển phần mềm theo yêu cầu (CRM, ERP, quản lý bán hàng), 
-                      tích hợp AI và tự động hóa quy trình giúp doanh nghiệp nâng cao hiệu suất.
-                    </p>
-                  </div>
-                </li>
-
-                <li className="flex items-start mt-8 group">
-                  <div className="p-3 rounded-full bg-blue-50 mr-5 group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">
-                    <CloudServerOutlined className="text-3xl text-blue-500 group-hover:text-white transition-colors duration-300" />
-                  </div>
-                  <div>
-                    <h5 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors duration-300">Hạ Tầng Hosting – Server – Bảo Mật</h5>
-                    <p className="text-sm">
-                      Cung cấp hosting/VPS tốc độ cao, ổn định, bảo mật mạnh mẽ, backup mỗi ngày 
-                      và hỗ trợ kỹ thuật 24/7 nhằm đảm bảo hệ thống vận hành liên tục.
-                    </p>
-                  </div>
-                </li>
+                {settings.features.map((feature, index) => (
+                  <li key={index} className="flex items-start mt-8 group">
+                    <div className="p-3 rounded-full bg-blue-50 mr-5 group-hover:bg-linear-to-r group-hover:from-blue-600 group-hover:to-teal-500 transition-all duration-300">
+                      {renderIcon(feature.icon)}
+                    </div>
+                    <div>
+                      <h5 className="text-lg font-bold mb-2 text-gray-800 group-hover:text-blue-600 transition-colors duration-300">
+                        {feature.title}
+                      </h5>
+                      <p className="text-sm">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </Reveal>
           </div>
@@ -100,7 +119,7 @@ const About = () => {
         <iframe
           width="100%"
           height="100%"
-          src="https://www.youtube.com/embed/z2EYAGlwBB0?autoplay=1"
+          src={settings.videoUrl}
           title="YouTube video player"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

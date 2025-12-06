@@ -137,6 +137,62 @@ class SettingsService {
 
     return true;
   }
+
+  /**
+   * Get about settings
+   */
+  async getAboutSettings() {
+    try {
+      const settings = await settingsModel.getAboutSettings();
+      return settings;
+    } catch (err) {
+      console.error('Service error getting about settings:', err);
+      throw new InternalError('Failed to retrieve about settings');
+    }
+  }
+
+  /**
+   * Update about settings
+   */
+  async updateAboutSettings(data) {
+    try {
+      // Validate data
+      this.validateAboutSettings(data);
+      
+      // Update settings
+      const updated = await settingsModel.updateAboutSettings(data);
+      return updated;
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        throw err;
+      }
+      console.error('Service error updating about settings:', err);
+      throw new InternalError('Failed to update about settings');
+    }
+  }
+
+  /**
+   * Reset about settings to default
+   */
+  async resetAboutSettings() {
+    try {
+      const reset = await settingsModel.resetAboutSettings();
+      return reset;
+    } catch (err) {
+      console.error('Service error resetting about settings:', err);
+      throw new InternalError('Failed to reset about settings');
+    }
+  }
+
+  /**
+   * Validate about settings data
+   */
+  validateAboutSettings(data) {
+    if (!data || typeof data !== 'object') {
+      throw new ValidationError('Invalid settings data');
+    }
+    return true;
+  }
 }
 
 module.exports = new SettingsService();

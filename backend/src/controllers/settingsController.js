@@ -110,6 +110,48 @@ class SettingsController {
       next(err);
     }
   }
+
+  /**
+   * @route   GET /api/settings/about
+   * @desc    Get about settings
+   * @access  Public
+   */
+  async getAboutSettings(req, res, next) {
+    try {
+      const settings = await settingsService.getAboutSettings();
+      return response.success(res, settings, 'About settings retrieved successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/about
+   * @desc    Update about settings
+   * @access  Public (should be protected in production)
+   */
+  async updateAboutSettings(req, res, next) {
+    try {
+      const settings = await settingsService.updateAboutSettings(req.body);
+      return response.success(res, settings, 'About settings updated successfully');
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * @route   POST /api/settings/about/reset
+   * @desc    Reset about settings to default
+   * @access  Public (should be protected in production)
+   */
+  async resetAboutSettings(req, res, next) {
+    try {
+      const settings = await settingsService.resetAboutSettings();
+      return response.success(res, settings, 'About settings reset to default');
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 module.exports = new SettingsController();

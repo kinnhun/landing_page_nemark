@@ -13,6 +13,11 @@ router.get('/banner', settingsController.getBannerSettings);
 router.post('/banner', settingsController.updateBannerSettings);
 router.post('/banner/reset', settingsController.resetBannerSettings);
 
+// About settings routes
+router.get('/about', settingsController.getAboutSettings);
+router.post('/about', settingsController.updateAboutSettings);
+router.post('/about/reset', settingsController.resetAboutSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 

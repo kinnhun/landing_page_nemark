@@ -8,6 +8,7 @@ class SettingsModel {
     this.headerFileName = 'header-settings.json';
     this.bannerFileName = 'banner-settings.json';
     this.aboutFileName = 'about-settings.json';
+    this.statsFileName = 'stats-settings.json';
     
     this.defaultHeaderSettings = {
       menu: {
@@ -95,6 +96,15 @@ class SettingsModel {
           title: 'Hạ Tầng Hosting – Server – Bảo Mật',
           description: 'Cung cấp hosting/VPS tốc độ cao, ổn định, bảo mật mạnh mẽ, backup mỗi ngày và hỗ trợ kỹ thuật 24/7 nhằm đảm bảo hệ thống vận hành liên tục.'
         }
+      ]
+    };
+
+    this.defaultStatsSettings = {
+      stats: [
+        { label: 'Khách Hàng Tin Dùng', value: 232 },
+        { label: 'Dự Án Hoàn Thành', value: 521 },
+        { label: 'Giờ Hỗ Trợ Kỹ Thuật', value: 1453 },
+        { label: 'Thành Viên Đội Ngũ', value: 32 }
       ]
     };
   }
@@ -202,6 +212,38 @@ class SettingsModel {
    */
   async resetAboutSettings() {
     return await storage.write(this.aboutFileName, this.defaultAboutSettings);
+  }
+
+  /**
+   * Get stats settings
+   */
+  async getStatsSettings() {
+    const settings = await storage.read(this.statsFileName);
+    if (!settings) return this.defaultStatsSettings;
+    
+    return {
+      ...this.defaultStatsSettings,
+      ...settings,
+      stats: settings.stats || this.defaultStatsSettings.stats
+    };
+  }
+
+  /**
+   * Update stats settings
+   */
+  async updateStatsSettings(data) {
+    const toSave = {
+      ...data,
+      lastUpdated: Date.now()
+    };
+    return await storage.write(this.statsFileName, toSave);
+  }
+
+  /**
+   * Reset stats settings
+   */
+  async resetStatsSettings() {
+    return await storage.write(this.statsFileName, this.defaultStatsSettings);
   }
 }
 

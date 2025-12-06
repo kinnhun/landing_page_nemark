@@ -52,6 +52,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ collapsed }) => {
           label: 'Cài Đặt About',
         },
         {
+          key: '/admin/settings-landing-page/stats',
+          icon: <AppstoreOutlined />,
+          label: 'Cài Đặt Thống Kê',
+        },
+        {
           key: '/admin/settings-landing-page/services',
           icon: <AppstoreOutlined />,
           label: 'Cài Đặt Dịch Vụ',

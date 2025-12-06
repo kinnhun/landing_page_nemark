@@ -18,6 +18,11 @@ router.get('/about', settingsController.getAboutSettings);
 router.post('/about', settingsController.updateAboutSettings);
 router.post('/about/reset', settingsController.resetAboutSettings);
 
+// Stats settings routes
+router.get('/stats', settingsController.getStatsSettings);
+router.post('/stats', settingsController.updateStatsSettings);
+router.post('/stats/reset', settingsController.resetStatsSettings);
+
 // Upload route
 router.post('/upload', upload.single('image'), settingsController.uploadImage);
 
